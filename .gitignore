@@ -1,0 +1,19 @@
+# Secrets. Never commit these.
+.env
+.streamlit/secrets.toml
+
+# Local Claude brief cache
+data/brief_cache.json
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+
+# OS and editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

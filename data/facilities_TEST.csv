@@ -1,0 +1,12 @@
+name,address,city,state,in_state,maternal_level,status,lat,lon,source
+Grady Memorial Hospital (PLACEHOLDER),80 Jesse Hill Jr Dr SE,Atlanta,GA,true,III,Active,33.7527,-84.3785,"PLACEHOLDER: real Georgia hospital city, unverified coordinates"
+Augusta University Medical Center (PLACEHOLDER),1120 15th St,Augusta,GA,true,III,Active,33.4711,-81.9865,"PLACEHOLDER: real Georgia hospital city, unverified coordinates"
+Memorial Health University Medical Center (PLACEHOLDER),4700 Waters Ave,Savannah,GA,true,III,Active,32.0217,-81.0912,"PLACEHOLDER: real Georgia hospital city, unverified coordinates"
+Atrium Health Navicent The Medical Center (PLACEHOLDER),777 Hemlock St,Macon,GA,true,III,Active,32.8329,-83.6394,"PLACEHOLDER: real Georgia hospital city, unverified coordinates"
+Piedmont Columbus Regional Midtown (PLACEHOLDER),710 Center St,Columbus,GA,true,III,Active,32.4866,-84.9583,"PLACEHOLDER: real Georgia hospital city, unverified coordinates"
+Phoebe Putney Memorial Hospital (PLACEHOLDER),417 W Third Ave,Albany,GA,true,III,Active,31.5837,-84.1502,"PLACEHOLDER: real Georgia hospital city, unverified coordinates"
+Northeast Georgia Medical Center Gainesville (PLACEHOLDER),743 Spring St NE,Gainesville,GA,true,III,Active,34.2921,-83.834,"PLACEHOLDER: real Georgia hospital city, unverified coordinates"
+Sacred Heart Medical Center Lavonia (PLACEHOLDER),367 Clear Creek Pkwy,Lavonia,GA,true,I,Active,34.4368,-83.1063,"PLACEHOLDER: real Georgia hospital city, unverified coordinates"
+"Wellstar Atlanta Medical Center (PLACEHOLDER, closed 2022)",303 Parkway Dr NE,Atlanta,GA,true,III,Inactive,33.7669,-84.3644,"PLACEHOLDER: real Georgia hospital city, unverified coordinates"
+Tallahassee Memorial HealthCare (PLACEHOLDER),1300 Miccosukee Rd,Tallahassee,FL,false,II,Active,30.4569,-84.261,"PLACEHOLDER: real Georgia hospital city, unverified coordinates"
+Erlanger Baroness Hospital (PLACEHOLDER),975 E Third St,Chattanooga,TN,false,III,Active,35.0439,-85.2953,"PLACEHOLDER: real Georgia hospital city, unverified coordinates"

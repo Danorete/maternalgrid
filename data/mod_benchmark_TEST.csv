@@ -1,0 +1,160 @@
+GEOID,county,mod_access_level,mod_is_desert
+13001,Appling,Maternity care desert,1
+13003,Atkinson,Maternity care desert,1
+13005,Bacon,Maternity care desert,1
+13007,Baker,Maternity care desert,1
+13009,Baldwin,Moderate access,0
+13011,Banks,Maternity care desert,1
+13013,Barrow,Moderate access,0
+13015,Bartow,Moderate access,0
+13017,Ben Hill,Maternity care desert,1
+13019,Berrien,Maternity care desert,1
+13021,Bibb,Full access,0
+13023,Bleckley,Maternity care desert,1
+13025,Brantley,Maternity care desert,1
+13027,Brooks,Maternity care desert,1
+13029,Bryan,Low access,0
+13031,Bulloch,Moderate access,0
+13033,Burke,Maternity care desert,1
+13035,Butts,Low access,0
+13037,Calhoun,Maternity care desert,1
+13039,Camden,Moderate access,0
+13043,Candler,Maternity care desert,1
+13045,Carroll,Full access,0
+13047,Catoosa,Moderate access,0
+13049,Charlton,Maternity care desert,1
+13051,Chatham,Full access,0
+13053,Chattahoochee,Maternity care desert,1
+13055,Chattooga,Low access,0
+13057,Cherokee,Full access,0
+13059,Clarke,Moderate access,0
+13061,Clay,Maternity care desert,1
+13063,Clayton,Full access,0
+13065,Clinch,Maternity care desert,1
+13067,Cobb,Full access,0
+13069,Coffee,Low access,0
+13071,Colquitt,Low access,0
+13073,Columbia,Full access,0
+13075,Cook,Moderate access,0
+13077,Coweta,Moderate access,0
+13079,Crawford,Maternity care desert,1
+13081,Crisp,Moderate access,0
+13083,Dade,Low access,0
+13085,Dawson,Low access,0
+13087,Decatur,Low access,0
+13089,DeKalb,Full access,0
+13091,Dodge,Low access,0
+13093,Dooly,Maternity care desert,1
+13095,Dougherty,Full access,0
+13097,Douglas,Full access,0
+13099,Early,Maternity care desert,1
+13101,Echols,Maternity care desert,1
+13103,Effingham,Full access,0
+13105,Elbert,Moderate access,0
+13107,Emanuel,Low access,0
+13109,Evans,Maternity care desert,1
+13111,Fannin,Moderate access,0
+13113,Fayette,Full access,0
+13115,Floyd,Moderate access,0
+13117,Forsyth,Full access,0
+13119,Franklin,Moderate access,0
+13121,Fulton,Full access,0
+13123,Gilmer,Moderate access,0
+13125,Glascock,Maternity care desert,1
+13127,Glynn,Moderate access,0
+13129,Gordon,Moderate access,0
+13131,Grady,Low access,0
+13133,Greene,Maternity care desert,1
+13135,Gwinnett,Full access,0
+13137,Habersham,Moderate access,0
+13139,Hall,Full access,0
+13141,Hancock,Maternity care desert,1
+13143,Haralson,Low access,0
+13145,Harris,Low access,0
+13147,Hart,Low access,0
+13149,Heard,Maternity care desert,1
+13151,Henry,Full access,0
+13153,Houston,Full access,0
+13155,Irwin,Maternity care desert,1
+13157,Jackson,Moderate access,0
+13159,Jasper,Maternity care desert,1
+13161,Jeff Davis,Maternity care desert,1
+13163,Jefferson,Maternity care desert,1
+13165,Jenkins,Maternity care desert,1
+13167,Johnson,Maternity care desert,1
+13169,Jones,Low access,0
+13171,Lamar,Maternity care desert,1
+13173,Lanier,Maternity care desert,1
+13175,Laurens,Low access,0
+13177,Lee,Moderate access,0
+13179,Liberty,Full access,0
+13181,Lincoln,Maternity care desert,1
+13183,Long,Maternity care desert,1
+13185,Lowndes,Moderate access,0
+13187,Lumpkin,Moderate access,0
+13189,McDuffie,Maternity care desert,1
+13191,McIntosh,Maternity care desert,1
+13193,Macon,Maternity care desert,1
+13195,Madison,Low access,0
+13197,Marion,Maternity care desert,1
+13199,Meriwether,Maternity care desert,1
+13201,Miller,Maternity care desert,1
+13205,Mitchell,Maternity care desert,1
+13207,Monroe,Moderate access,0
+13209,Montgomery,Maternity care desert,1
+13211,Morgan,Maternity care desert,1
+13213,Murray,Low access,0
+13215,Muscogee,Full access,0
+13217,Newton,Moderate access,0
+13219,Oconee,Low access,0
+13221,Oglethorpe,Maternity care desert,1
+13223,Paulding,Full access,0
+13225,Peach,Low access,0
+13227,Pickens,Moderate access,0
+13229,Pierce,Maternity care desert,1
+13231,Pike,Maternity care desert,1
+13233,Polk,Moderate access,0
+13235,Pulaski,Maternity care desert,1
+13237,Putnam,Low access,0
+13239,Quitman,Maternity care desert,1
+13241,Rabun,Maternity care desert,1
+13243,Randolph,Maternity care desert,1
+13245,Richmond,Full access,0
+13247,Rockdale,Moderate access,0
+13249,Schley,Maternity care desert,1
+13251,Screven,Low access,0
+13253,Seminole,Maternity care desert,1
+13255,Spalding,Full access,0
+13257,Stephens,Low access,0
+13259,Stewart,Maternity care desert,1
+13261,Sumter,Moderate access,0
+13263,Talbot,Maternity care desert,1
+13265,Taliaferro,Maternity care desert,1
+13267,Tattnall,Moderate access,0
+13269,Taylor,Maternity care desert,1
+13271,Telfair,Maternity care desert,1
+13273,Terrell,Maternity care desert,1
+13275,Thomas,Low access,0
+13277,Tift,Low access,0
+13279,Toombs,Low access,0
+13281,Towns,Maternity care desert,1
+13283,Treutlen,Maternity care desert,1
+13285,Troup,Moderate access,0
+13287,Turner,Maternity care desert,1
+13289,Twiggs,Maternity care desert,1
+13291,Union,Low access,0
+13293,Upson,Moderate access,0
+13295,Walker,Moderate access,0
+13297,Walton,Moderate access,0
+13299,Ware,Moderate access,0
+13301,Warren,Maternity care desert,1
+13303,Washington,Moderate access,0
+13305,Wayne,Low access,0
+13307,Webster,Maternity care desert,1
+13309,Wheeler,Maternity care desert,1
+13311,White,Low access,0
+13313,Whitfield,Full access,0
+13315,Wilcox,Maternity care desert,1
+13317,Wilkes,Maternity care desert,1
+13319,Wilkinson,Maternity care desert,1
+13321,Worth,Low access,0
