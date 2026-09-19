@@ -5,7 +5,12 @@ statewide summary, a sample of counties, the facility list and both preset
 scenario results. Paste it in as sample data so a mock-up renders real shaped
 numbers instead of lorem ipsum.
 
-Usage: python scripts/export_for_design.py [out.json]
+Usage:
+  python scripts/export_for_design.py [out.json]
+  python scripts/export_for_design.py [out.json] --with-geojson
+
+--with-geojson embeds the 159 county boundaries so a prototype can draw the
+map itself. It roughly doubles the file size.
 """
 
 import json
@@ -27,8 +32,11 @@ from src.data_loader import (  # noqa: E402
 from src.presets import county_add_point, find_lavonia_facility, largest_gap_county  # noqa: E402
 from src.simulate import run_scenario  # noqa: E402
 
+# lat and lon are included on purpose: with them, a client side app can
+# recompute the whole access model from the facility list, so an interactive
+# prototype can genuinely simulate rather than replay canned results.
 COUNTY_COLS = [
-    "GEOID", "county", "births", "women_15_44", "ob_providers",
+    "GEOID", "county", "lat", "lon", "births", "women_15_44", "ob_providers",
     "births_per_ob_provider", "minutes", "has_access", "nearest_facility",
     "high_level_minutes", "mod_access_level",
 ]
@@ -48,7 +56,9 @@ def scenario_block(result):
 
 
 def main():
-    out_path = Path(sys.argv[1]) if len(sys.argv) > 1 else ROOT / "design_snapshot.json"
+    args = [a for a in sys.argv[1:] if not a.startswith("--")]
+    with_geojson = "--with-geojson" in sys.argv
+    out_path = Path(args[0]) if args else ROOT / "design_snapshot.json"
 
     counties = load_counties()
     facilities = load_facilities()
@@ -69,6 +79,11 @@ def main():
             "avg_speed_mph": AVG_SPEED_MPH,
             "access_threshold_minutes": ACCESS_THRESHOLD_MIN,
             "note": "All minutes are modeled from straight line distance, not real drive times.",
+            "formula": (
+                "minutes = haversine_miles(county_centroid, nearest_active_facility) "
+                "* road_factor / avg_speed_mph * 60. A county has access when minutes "
+                "<= access_threshold_minutes. Earth radius 3958.7613 miles."
+            ),
         },
         "statewide_summary": statewide,
         "counties_sample": json.loads(
@@ -85,6 +100,9 @@ def main():
         ),
         "scenarios": {},
     }
+
+    if with_geojson:
+        payload["county_geojson"] = geojson
 
     if lavonia:
         payload["scenarios"]["lavonia_closure"] = scenario_block(
