@@ -11,6 +11,7 @@ Everything joins on GEOID held as a 5 character string.
 from __future__ import annotations
 
 import json
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -29,6 +30,31 @@ DATASETS = {
 }
 
 
+def facility_files() -> list[Path]:
+    """Every facilities dataset in data/, in precedence order.
+
+    `facilities.csv` is the agreed file and always wins. Anything else matching
+    `facilities*.csv` is a working variant, so two people can each keep their own
+    compiled list side by side and compare them in the app. The placeholder
+    sorts last, so it is only ever the default when nothing real exists.
+    """
+    found = sorted(DATA_DIR.glob("facilities*.csv"))
+    agreed = [f for f in found if f.name == "facilities.csv"]
+    placeholder = [f for f in found if f.name == "facilities_TEST.csv"]
+    variants = [f for f in found if f not in agreed and f not in placeholder]
+    return agreed + variants + placeholder
+
+
+def default_facility_file() -> Path:
+    files = facility_files()
+    if not files:
+        raise FileNotFoundError(
+            f"no facilities*.csv found in {DATA_DIR}. "
+            "Run scripts/build_test_data.py, or add your own facilities.csv."
+        )
+    return files[0]
+
+
 def resolve(key: str):
     """Return (path, is_test) for a dataset key, preferring the real file."""
     real_name, test_name, _label = DATASETS[key]
@@ -45,17 +71,25 @@ def resolve(key: str):
 
 
 @st.cache_data(show_spinner=False)
-def data_status() -> dict:
+def data_status(facilities_path: str | None = None) -> dict:
     """Which datasets are running on placeholder files right now."""
+    chosen = Path(facilities_path) if facilities_path else default_facility_file()
+    facilities_are_test = chosen.name == "facilities_TEST.csv"
+
     test_labels = []
     for key, (_real, _test, label) in DATASETS.items():
-        path, is_test = resolve(key)
+        if key == "facilities":
+            if facilities_are_test:
+                test_labels.append(label)
+            continue
+        _path, is_test = resolve(key)
         if is_test:
             test_labels.append(label)
     return {
         "using_test_data": bool(test_labels),
         "test_datasets": test_labels,
-        "facilities_are_test": resolve("facilities")[1],
+        "facilities_are_test": facilities_are_test,
+        "facilities_file": chosen.name,
     }
 
 
@@ -117,9 +151,13 @@ def load_counties() -> pd.DataFrame:
 
 
 @st.cache_data(show_spinner=False)
-def load_facilities() -> pd.DataFrame:
-    """All facilities, active and not, with normalised flags."""
-    path, _is_test = resolve("facilities")
+def load_facilities(facilities_path: str | None = None) -> pd.DataFrame:
+    """All facilities, active and not, with normalised flags.
+
+    Pass a path to load a specific variant; the default is whichever file
+    facility_files() ranks first.
+    """
+    path = Path(facilities_path) if facilities_path else default_facility_file()
     df = pd.read_csv(path)
 
     df["name"] = df["name"].astype(str).str.strip()

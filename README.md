@@ -52,9 +52,52 @@ Placeholder files live beside the real name with a `_TEST` suffix, for example
 naming each one. **Drop the real file into `data/` and the app picks it up on the
 next rerun. Nothing else has to change.**
 
+### facilities.csv
+
+The one file compiled by hand, and the one the whole model turns on. One row per
+hospital, including the ones that no longer deliver.
+
+| Column | Required | What it does |
+| --- | --- | --- |
+| `name` | yes | Identifies the facility everywhere: the removal list, the absorbing facility, the modeled volume table. **Must be unique**, since volumes group by it |
+| `in_state` | yes | `true` for Georgia, which makes it closable in a scenario. Anything else means a fixed border hospital. Accepts `true/1/yes/y/t` |
+| `maternal_level` | yes | One of `I`, `II`, `III`, `IV`. `Level III` also works. `III` and `IV` count as higher level maternal care |
+| `status` | yes | Only `Active` counts. Anything else (`Inactive`, `Closed`) is hidden from the map and excluded from every calculation |
+| `lat`, `lon` | yes | Decimal degrees. Georgia longitudes are negative. **A row with unreadable coordinates is dropped silently** |
+| `address`, `city`, `state`, `source` | no | Display and provenance only. Blank is fine |
+
 Only facilities with `status` of `Active` count in any calculation. Only
 `in_state` facilities can be closed in a scenario, so border hospitals in
 Florida, Tennessee, Alabama and the Carolinas stay fixed.
+
+Check a file before trusting it:
+
+```bash
+python scripts/check_facilities.py data/facilities_andre.csv
+```
+
+It flags duplicate names, bad levels, coordinates that would be dropped or that
+look swapped, a status nothing matches, and an `in_state` value that is not
+clearly true or false. It exits non zero if the app would misbehave.
+
+### Comparing two compiled lists
+
+Any file matching `data/facilities*.csv` shows up in a **Facility dataset**
+picker in the sidebar, so two people can compile independently and compare what
+each list implies for access.
+
+1. Each person writes their own, for example `data/facilities_ore.csv` and
+   `data/facilities_andre.csv`, and commits it. Neither becomes canonical,
+   because the app only treats the exact name `facilities.csv` as the agreed file
+2. Pull, then switch between them in the picker. The statewide numbers and the
+   map update, so the differences are visible immediately
+3. Agree on one, save it as `data/facilities.csv`, and it wins from then on
+
+Switching the dataset clears any running scenario, since a scenario names
+facilities from the file it ran against.
+
+For a private scratch file that should never be committed, name it
+`data/facilities_local.csv`. That pattern is gitignored.
 
 ### Regenerating the data
 

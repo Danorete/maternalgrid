@@ -5,6 +5,8 @@ Run with: streamlit run app.py
 
 from __future__ import annotations
 
+from pathlib import Path
+
 import pandas as pd
 import streamlit as st
 
@@ -21,6 +23,8 @@ from src.config import (
 from src.data_loader import (
     active_facilities,
     data_status,
+    default_facility_file,
+    facility_files,
     load_counties,
     load_facilities,
     load_geojson,
@@ -49,15 +53,20 @@ def bundle():
     individually cached, so repeat calls are cheap.
     """
     counties = load_counties()
-    facilities = load_facilities()
+    facilities = load_facilities(st.session_state.get("facility_file"))
     geojson = load_geojson()
     active = active_facilities(facilities)
     access, summary = _baseline(counties, active, facilities, geojson)
     return counties, facilities, geojson, active, access, summary
 
 
+_facility_options = [str(f) for f in facility_files()]
+if st.session_state.get("facility_file") not in _facility_options:
+    # The chosen file was renamed or removed between runs.
+    st.session_state["facility_file"] = str(default_facility_file())
+
 counties, facilities, geojson, active, baseline_access, statewide = bundle()
-status = data_status()
+status = data_status(st.session_state["facility_file"])
 
 
 # ---------------------------------------------------------------- session state
@@ -86,6 +95,15 @@ def _execute(facility_table, county_table, remove_names, add_points, label):
     st.session_state.brief = None
     st.session_state.preset_note = None
     st.session_state.map_view = "After scenario"
+
+
+def on_facility_file_change():
+    """A scenario names facilities from the file it ran against, so drop it."""
+    st.session_state.scenario = None
+    st.session_state.brief = None
+    st.session_state.preset_note = None
+    st.session_state.remove_names = []
+    st.session_state.add_county = "None"
 
 
 def on_reset():
@@ -213,6 +231,22 @@ st.caption(
 # ---------------------------------------------------------------- sidebar
 
 with st.sidebar:
+    if len(_facility_options) > 1:
+        st.header("Facility dataset")
+        st.selectbox(
+            "Which compiled facility list to model",
+            options=_facility_options,
+            key="facility_file",
+            format_func=lambda p: Path(p).name,
+            on_change=on_facility_file_change,
+            help=(
+                "Every facilities*.csv in data/ shows up here. Switch between two "
+                "independently compiled lists to compare what each one implies for "
+                "access. Changing it clears the current scenario."
+            ),
+        )
+        st.divider()
+
     st.header("Scenario controls")
     st.caption(
         "Only Georgia facilities can be closed. Border state facilities stay fixed "

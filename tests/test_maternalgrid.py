@@ -179,3 +179,38 @@ def test_scenario_before_table_matches_the_baseline(data):
     pd.testing.assert_series_equal(
         result["before"]["minutes"], access["minutes"], check_names=False
     )
+
+
+# ------------------------------------------------------------------ facility variants
+
+def test_facility_files_rank_agreed_over_variant_over_placeholder(tmp_path, monkeypatch):
+    import src.data_loader as dl
+
+    monkeypatch.setattr(dl, "DATA_DIR", tmp_path)
+    for name in ("facilities_TEST.csv", "facilities_andre.csv", "facilities.csv"):
+        (tmp_path / name).write_text("name\n")
+
+    assert [f.name for f in dl.facility_files()] == [
+        "facilities.csv",
+        "facilities_andre.csv",
+        "facilities_TEST.csv",
+    ]
+    assert dl.default_facility_file().name == "facilities.csv"
+
+
+def test_variant_wins_over_placeholder_when_no_agreed_file(tmp_path, monkeypatch):
+    import src.data_loader as dl
+
+    monkeypatch.setattr(dl, "DATA_DIR", tmp_path)
+    (tmp_path / "facilities_TEST.csv").write_text("name\n")
+    (tmp_path / "facilities_ore.csv").write_text("name\n")
+
+    assert dl.default_facility_file().name == "facilities_ore.csv"
+
+
+def test_no_facility_file_at_all_is_a_clear_error(tmp_path, monkeypatch):
+    import src.data_loader as dl
+
+    monkeypatch.setattr(dl, "DATA_DIR", tmp_path)
+    with pytest.raises(FileNotFoundError, match="facilities"):
+        dl.default_facility_file()

@@ -5,6 +5,10 @@
 # Local Claude brief cache
 data/brief_cache.json
 
+# Private facility drafts. Named variants like facilities_ore.csv are meant
+# to be committed so two compiled lists can be compared.
+data/facilities_local*.csv
+
 # Python
 __pycache__/
 *.py[cod]
