@@ -13,12 +13,17 @@ from src.config import (
     MAP_STYLE_TILED,
 )
 
-LEVEL_COLORS = {
-    "I": "#8ecae6",
-    "II": "#219ebc",
-    "III": "#023047",
-    "IV": "#7b2cbf",
-}
+# Maternal level is carried by marker SIZE, not hue. The map already spends its
+# colour budget on the county fill, so every Georgia facility shares one ink and
+# a white ring that keeps it visible over the dark end of the ramp.
+FACILITY_INK = "#1a1a19"
+FACILITY_RING = "#ffffff"
+LEVEL_SIZES = {"I": 8, "II": 11, "III": 14, "IV": 17}
+
+# Travel time ramp: one hue, light to dark, five bins. Validated for colour
+# vision deficiency and for contrast against a light surface.
+TRAVEL_BINS = [15, 30, 45, 60]
+TRAVEL_COLORS = ["#f1936a", "#e06a43", "#c04a24", "#9c3717", "#6d2410"]
 MOD_LEVEL_ORDER = [
     "Full access",
     "Moderate access",
@@ -87,9 +92,20 @@ def build_map(access: pd.DataFrame, facilities: pd.DataFrame, geojson: dict,
         zmin, zmax = None, None
     else:
         z = df["minutes"].astype(float)
-        colorbar = dict(title="Modeled<br>minutes")
-        colorscale = "RdYlGn_r"
-        zmin, zmax = 0, max(60, float(df["minutes"].max() or 60))
+        colorbar = dict(
+            title="Modeled<br>minutes",
+            tickmode="array",
+            tickvals=[0, 15, 30, 45, 60, 75],
+        )
+        # Discrete bins rather than a continuous blend, so the legend classes are
+        # the same thing the eye reads off the map.
+        upper = max(75.0, float(df["minutes"].max() or 75))
+        stops = [0.0] + [b / upper for b in TRAVEL_BINS] + [1.0]
+        colorscale = []
+        for i, colour in enumerate(TRAVEL_COLORS):
+            colorscale.append([min(stops[i], 1.0), colour])
+            colorscale.append([min(stops[i + 1], 1.0), colour])
+        zmin, zmax = 0, upper
 
     fig = go.Figure(
         go.Choroplethmapbox(
@@ -136,11 +152,20 @@ def _add_facility_markers(fig: go.Figure, facilities: pd.DataFrame) -> None:
         sub = active[active["in_state"] & (active["maternal_level"] == level)]
         if sub.empty:
             continue
+        size = LEVEL_SIZES[level]
+        # White ring first, ink on top: mapbox markers have no marker.line.
+        fig.add_trace(
+            go.Scattermapbox(
+                lat=sub["lat"], lon=sub["lon"], mode="markers",
+                name=f"ring-{level}", showlegend=False, hoverinfo="skip",
+                marker=dict(size=size + 4, color=FACILITY_RING, opacity=1.0),
+            )
+        )
         fig.add_trace(
             go.Scattermapbox(
                 lat=sub["lat"], lon=sub["lon"], mode="markers",
                 name=f"Georgia, Level {level}",
-                marker=dict(size=13, color=LEVEL_COLORS[level], opacity=0.95),
+                marker=dict(size=size, color=FACILITY_INK, opacity=0.95),
                 customdata=sub[["name", "city", "maternal_level"]].to_numpy(),
                 hovertemplate=(
                     "<b>%{customdata[0]}</b><br>%{customdata[1]}, GA<br>"
@@ -155,7 +180,7 @@ def _add_facility_markers(fig: go.Figure, facilities: pd.DataFrame) -> None:
             go.Scattermapbox(
                 lat=border["lat"], lon=border["lon"], mode="markers",
                 name="Border state (fixed)",
-                marker=dict(size=15, color="rgba(255,255,255,0.15)", opacity=1.0),
+                marker=dict(size=15, color=FACILITY_INK, opacity=1.0),
                 customdata=border[["name", "city", "state", "maternal_level"]].to_numpy(),
                 hovertemplate=(
                     "<b>%{customdata[0]}</b><br>%{customdata[1]}, %{customdata[2]}<br>"
@@ -170,7 +195,7 @@ def _add_facility_markers(fig: go.Figure, facilities: pd.DataFrame) -> None:
             go.Scattermapbox(
                 lat=border["lat"], lon=border["lon"], mode="markers",
                 name="border-inner", showlegend=False, hoverinfo="skip",
-                marker=dict(size=8, color="#ffffff", opacity=1.0),
+                marker=dict(size=10, color=FACILITY_RING, opacity=1.0),
             )
         )
 

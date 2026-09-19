@@ -25,8 +25,8 @@
   --mg-border: #e3e6eb;
   --mg-text: #16202c;
   --mg-text-muted: #5d6b7a;
-  --mg-accent: #0b6b5e;
-  --mg-accent-soft: #e6f2f0;
+  --mg-accent: #256abf;
+  --mg-accent-soft: #e8f0fb;
   --mg-warn-bg: #fff3bf;
   --mg-warn-border: #f59f00;
   --mg-warn-text: #5f3f00;
@@ -116,8 +116,8 @@
 }
 
 [data-testid="stBaseButton-primary"]:hover {
-  background: #095549;
-  border-color: #095549;
+  background: #1c5cab;
+  border-color: #1c5cab;
 }
 
 [data-testid="stDataFrame"] {
