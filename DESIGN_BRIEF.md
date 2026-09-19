@@ -2,6 +2,54 @@
 
 Paste this into AI Studio's app builder to explore a redesign of MaternalGrid.
 
+## How the handoff works
+
+The app has a **single styling seam**: `assets/theme.css`. `app.py` injects it
+verbatim at startup and nothing else in the codebase carries visual styling. So
+the loop is:
+
+1. Give AI Studio this brief plus `design_snapshot.json`
+2. Ask it for **CSS only**, in the token-plus-rules shape that file already uses
+3. Replace `assets/theme.css`. Reload the browser. Done, no Python touched
+
+That is what "leaving the design to AI Studio" means in practice, and its limit:
+AI Studio decides colour, type, spacing, borders, card treatment and emphasis.
+It cannot change **layout structure**, because layout is Streamlit columns in
+`app.py`. If a proposal needs a different arrangement of panels, that is a code
+change and someone has to make it.
+
+Streamlit's own theme knobs live in `.streamlit/config.toml` under `[theme]`:
+`primaryColor`, `backgroundColor`, `secondaryBackgroundColor`, `textColor`,
+`font`. Set those to match, so widgets Streamlit renders internally agree with
+the CSS.
+
+### CSS hooks that exist
+
+Verified against the running app. Stable for the pinned `streamlit==1.40.2`;
+a major Streamlit upgrade can move them.
+
+```
+stApp  stMain  stMainBlockContainer  stHeader
+stSidebar  stSidebarContent
+stVerticalBlock  stHorizontalBlock  stColumn  stElementContainer
+stMetric  stMetricLabel  stMetricValue
+stMarkdown  stMarkdownContainer  stHeading  stCaptionContainer
+stButton  stBaseButton-primary  stBaseButton-secondary
+stSelectbox  stMultiSelect  stCheckbox  stWidgetLabel
+stPlotlyChart  stDataFrame  stAlert  stTabs
+```
+
+Target them as `[data-testid="stMetric"]`.
+
+### Two traps
+
+- **Metric labels truncate.** They are long, and Streamlit ellipsises them.
+  Do not uppercase or letterspace them. `white-space: normal` is already set so
+  they wrap; keep it
+- **The map is a Plotly canvas.** CSS can frame it but cannot restyle its
+  interior. The choropleth colour scale and the facility marker colours live in
+  `src/mapping.py`, so ask AI Studio for those as hex values and port them
+
 ## Read this first
 
 AI Studio cannot read this repository, and it builds web apps in React or HTML

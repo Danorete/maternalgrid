@@ -1,0 +1,125 @@
+/* MaternalGrid theme.
+ *
+ * THIS IS THE ONLY FILE YOU NEED TO REPLACE TO RESTYLE THE APP.
+ * app.py injects it verbatim. Nothing in src/ or app.py needs to change.
+ *
+ * Edit the tokens in :root first. The rules below are written against them, so
+ * a palette change is a handful of lines. The selectors target Streamlit's
+ * data-testid hooks, which are stable for the pinned streamlit==1.40.2 and may
+ * move on a major upgrade.
+ *
+ * Available hooks, verified against the running app:
+ *   stApp stMain stMainBlockContainer stHeader stSidebar stSidebarContent
+ *   stVerticalBlock stHorizontalBlock stColumn stElementContainer
+ *   stMetric stMetricLabel stMetricValue
+ *   stMarkdown stMarkdownContainer stHeading stCaptionContainer
+ *   stButton stBaseButton-primary stBaseButton-secondary
+ *   stSelectbox stMultiSelect stCheckbox stWidgetLabel
+ *   stPlotlyChart stDataFrame stAlert stTabs
+ */
+
+:root {
+  /* Palette */
+  --mg-bg: #ffffff;
+  --mg-surface: #f7f8fa;
+  --mg-border: #e3e6eb;
+  --mg-text: #16202c;
+  --mg-text-muted: #5d6b7a;
+  --mg-accent: #0b6b5e;
+  --mg-accent-soft: #e6f2f0;
+  --mg-warn-bg: #fff3bf;
+  --mg-warn-border: #f59f00;
+  --mg-warn-text: #5f3f00;
+
+  /* Typography */
+  --mg-font: "Source Sans Pro", system-ui, -apple-system, sans-serif;
+  --mg-metric-size: 2.35rem;
+  --mg-metric-label-size: 0.86rem;
+
+  /* Shape and rhythm */
+  --mg-radius: 10px;
+  --mg-gap: 1rem;
+  --mg-card-pad: 0.85rem 1rem;
+}
+
+/* Give the map more room: trim Streamlit's default top padding. */
+[data-testid="stMainBlockContainer"] {
+  padding-top: 2.4rem;
+  max-width: 100%;
+}
+
+/* Metric cards: the four numbers should read from across a room. */
+[data-testid="stMetric"] {
+  background: var(--mg-surface);
+  border: 1px solid var(--mg-border);
+  border-radius: var(--mg-radius);
+  padding: var(--mg-card-pad);
+  height: 100%;
+}
+
+[data-testid="stMetricValue"] {
+  font-size: var(--mg-metric-size);
+  font-weight: 650;
+  line-height: 1.1;
+  color: var(--mg-text);
+}
+
+/* Sentence case and wrapping on purpose: these labels are long, and uppercase
+   makes them wide enough that Streamlit truncates them with an ellipsis. */
+[data-testid="stMetricLabel"] p {
+  font-size: var(--mg-metric-label-size);
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--mg-text-muted);
+  white-space: normal;
+  overflow: visible;
+}
+
+[data-testid="stMetricLabel"] {
+  white-space: normal;
+  overflow: visible;
+  min-height: 2.5em;
+}
+
+/* Section headings sit closer to what they label. */
+[data-testid="stHeading"] h5 {
+  margin-bottom: 0.35rem;
+  color: var(--mg-text-muted);
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+/* Captions carry the modeled-not-measured disclaimers. Keep them legible. */
+[data-testid="stCaptionContainer"] p {
+  color: var(--mg-text-muted);
+  line-height: 1.45;
+}
+
+/* Sidebar reads as a control panel, distinct from the canvas. */
+[data-testid="stSidebarContent"] {
+  background: var(--mg-surface);
+  border-right: 1px solid var(--mg-border);
+}
+
+/* The map is the product. Frame it. */
+[data-testid="stPlotlyChart"] {
+  border: 1px solid var(--mg-border);
+  border-radius: var(--mg-radius);
+  overflow: hidden;
+}
+
+/* Primary action. */
+[data-testid="stBaseButton-primary"] {
+  background: var(--mg-accent);
+  border-color: var(--mg-accent);
+  font-weight: 600;
+}
+
+[data-testid="stBaseButton-primary"]:hover {
+  background: #095549;
+  border-color: #095549;
+}
+
+[data-testid="stDataFrame"] {
+  border-radius: var(--mg-radius);
+}

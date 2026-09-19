@@ -158,6 +158,10 @@ and that displaced births are fully absorbed.
 
 ## Design
 
+All styling lives in one file, `assets/theme.css`, injected by `app.py`. Replace
+it to restyle the app; no Python changes needed. Base colours also live in
+`.streamlit/config.toml` under `[theme]`.
+
 `DESIGN_BRIEF.md` is a self-contained brief for redesigning the interface in a
 tool that cannot read this repo, such as Google AI Studio. Pair it with a data
 snapshot so a mock-up renders real shaped numbers:

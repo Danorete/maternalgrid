@@ -19,6 +19,7 @@ from src.config import (
     LAYERS,
     MOD_2026,
     ROAD_FACTOR,
+    THEME_CSS_PATH,
 )
 from src.data_loader import (
     active_facilities,
@@ -34,6 +35,20 @@ from src.presets import county_add_point, find_lavonia_facility, largest_gap_cou
 from src.simulate import removable_facility_names, run_scenario
 
 st.set_page_config(page_title="MaternalGrid", page_icon="🩺", layout="wide")
+
+
+@st.cache_data(show_spinner=False)
+def _theme_css() -> str:
+    """The whole look lives in assets/theme.css. Missing file is fine."""
+    try:
+        return THEME_CSS_PATH.read_text()
+    except OSError:
+        return ""
+
+
+_css = _theme_css()
+if _css:
+    st.markdown(f"<style>{_css}</style>", unsafe_allow_html=True)
 
 
 # ---------------------------------------------------------------- data loading

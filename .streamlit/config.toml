@@ -3,3 +3,12 @@ headless = true
 
 [browser]
 gatherUsageStats = false
+
+# Base colours. Keep these in step with the tokens at the top of
+# assets/theme.css, which controls everything else.
+[theme]
+primaryColor = "#0b6b5e"
+backgroundColor = "#ffffff"
+secondaryBackgroundColor = "#f7f8fa"
+textColor = "#16202c"
+font = "sans serif"

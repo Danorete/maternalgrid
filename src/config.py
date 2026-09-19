@@ -6,6 +6,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 DATA_DIR = ROOT / "data"
 BRIEF_CACHE_PATH = DATA_DIR / "brief_cache.json"
+# The single file that controls the app's look. Swap it to restyle; the app
+# runs fine without it.
+THEME_CSS_PATH = ROOT / "assets" / "theme.css"
 
 # Travel model. Straight line miles from a county centroid to the nearest
 # active facility, inflated by a road factor, converted to minutes at an
