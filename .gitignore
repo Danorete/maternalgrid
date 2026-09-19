@@ -21,3 +21,5 @@ venv/
 Thumbs.db
 .vscode/
 .idea/
+data/design_snapshot.json
+design_snapshot.json

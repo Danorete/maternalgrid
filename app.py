@@ -175,9 +175,9 @@ if status["using_test_data"]:
         else "TEST DATA: not for presentation"
     )
     facility_caveat = (
-        f"With only {statewide['active_facility_count']} placeholder facilities in "
-        "place, the modeled travel times below run far higher than Georgia's real "
-        "network of roughly 75 delivering hospitals would produce."
+        f"The {statewide['active_facility_count']} active facilities are real Georgia "
+        "and border hospitals at approximate coordinates, but which of them currently "
+        "delivers has not been verified, so every figure here is indicative only."
         if status["facilities_are_test"]
         else ""
     )

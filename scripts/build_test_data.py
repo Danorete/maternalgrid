@@ -12,7 +12,6 @@ mirror), so these stand in until the real extracts land:
   women_15_44.csv    Census ACS 5 year, table B01001
   providers.csv      NPPES NPI Registry, OB/GYN and midwife taxonomies
   mod_benchmark.csv  March of Dimes county access levels
-  facilities.csv     GA DPH designations plus DCH, compiled by hand
 
 The county geography (data/counties.csv, data/ga_counties.geojson) IS real and
 is built separately by scripts/build_base_data.py.
@@ -64,23 +63,10 @@ DEFAULT_WEIGHT = 1.0  # tier 5: everything not named above
 
 MOD_LEVELS = ["Full access", "Moderate access", "Low access", "Maternity care desert"]
 
-# 8 placeholder Georgia facilities sited on real Georgia hospital cities, plus
-# 2 out of state border hospitals that the model must keep fixed. Coordinates
-# are rough city centre points, not verified hospital addresses.
-FACILITIES = [
-    # name, address, city, state, in_state, maternal_level, status, lat, lon
-    ("Grady Memorial Hospital (PLACEHOLDER)", "80 Jesse Hill Jr Dr SE", "Atlanta", "GA", True, "III", "Active", 33.7527, -84.3785),
-    ("Augusta University Medical Center (PLACEHOLDER)", "1120 15th St", "Augusta", "GA", True, "III", "Active", 33.4711, -81.9865),
-    ("Memorial Health University Medical Center (PLACEHOLDER)", "4700 Waters Ave", "Savannah", "GA", True, "III", "Active", 32.0217, -81.0912),
-    ("Atrium Health Navicent The Medical Center (PLACEHOLDER)", "777 Hemlock St", "Macon", "GA", True, "III", "Active", 32.8329, -83.6394),
-    ("Piedmont Columbus Regional Midtown (PLACEHOLDER)", "710 Center St", "Columbus", "GA", True, "III", "Active", 32.4866, -84.9583),
-    ("Phoebe Putney Memorial Hospital (PLACEHOLDER)", "417 W Third Ave", "Albany", "GA", True, "III", "Active", 31.5837, -84.1502),
-    ("Northeast Georgia Medical Center Gainesville (PLACEHOLDER)", "743 Spring St NE", "Gainesville", "GA", True, "III", "Active", 34.2921, -83.8340),
-    ("Sacred Heart Medical Center Lavonia (PLACEHOLDER)", "367 Clear Creek Pkwy", "Lavonia", "GA", True, "I", "Active", 34.4368, -83.1063),
-    ("Wellstar Atlanta Medical Center (PLACEHOLDER, closed 2022)", "303 Parkway Dr NE", "Atlanta", "GA", True, "III", "Inactive", 33.7669, -84.3644),
-    ("Tallahassee Memorial HealthCare (PLACEHOLDER)", "1300 Miccosukee Rd", "Tallahassee", "FL", False, "II", "Active", 30.4569, -84.2610),
-    ("Erlanger Baroness Hospital (PLACEHOLDER)", "975 E Third St", "Chattanooga", "TN", False, "III", "Active", 35.0439, -85.2953),
-]
+# The placeholder facility list now lives in data/facilities_TEST.csv directly,
+# since it is a hand curated set of real Georgia and border hospital locations
+# rather than anything generated. This script no longer rewrites it; edit the
+# CSV, then run scripts/check_facilities.py to validate it.
 
 
 def county_weight(name):
@@ -164,13 +150,6 @@ def main():
               ["GEOID", "county", "ob_gyn", "midwives", "ob_providers"], prov_rows)
     write_csv(DATA / "mod_benchmark_TEST.csv",
               ["GEOID", "county", "mod_access_level", "mod_is_desert"], mod_rows)
-    write_csv(DATA / "facilities_TEST.csv",
-              ["name", "address", "city", "state", "in_state", "maternal_level",
-               "status", "lat", "lon", "source"],
-              [(n, a, c, s, str(i).lower(), m, st, la, lo,
-                "PLACEHOLDER: real Georgia hospital city, unverified coordinates")
-               for n, a, c, s, i, m, st, la, lo in FACILITIES])
-
     print(f"\ntotal synthetic births {sum(r[3] for r in births_rows):,}")
     print(f"total synthetic women 15 to 44 {sum(r[2] for r in women_rows):,}")
     print(f"counties with zero OB providers {sum(1 for r in prov_rows if r[4] == 0)}")

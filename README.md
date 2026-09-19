@@ -47,6 +47,12 @@ Everything joins on `GEOID` held as a 5 character string.
 | `data/mod_benchmark.csv` | March of Dimes county access levels | Placeholder |
 | `data/facilities.csv` | GA DPH designations and GA DCH | Placeholder |
 
+The facility placeholder is hand curated rather than generated: 68 active real
+Georgia and border hospitals at approximate coordinates. Which of them currently
+delivers is **unverified**, so it stands in for the real compiled list and the
+banner stays up. `scripts/build_test_data.py` does not overwrite it.
+
+
 Placeholder files live beside the real name with a `_TEST` suffix, for example
 `data/births_TEST.csv`. While any of them is in use the app shows a yellow banner
 naming each one. **Drop the real file into `data/` and the app picks it up on the
@@ -149,3 +155,18 @@ python -m pytest tests/test_maternalgrid.py -q
 Covers the travel maths, that closures never improve access and additions never
 worsen it, that border and inactive facilities are never removable or assignable,
 and that displaced births are fully absorbed.
+
+## Design
+
+`DESIGN_BRIEF.md` is a self-contained brief for redesigning the interface in a
+tool that cannot read this repo, such as Google AI Studio. Pair it with a data
+snapshot so a mock-up renders real shaped numbers:
+
+```bash
+python scripts/export_for_design.py
+```
+
+## Demo
+
+`DEMO.md` is the runbook for the live demo: pre-flight checklist, click
+sequence, and what to do when something breaks.
