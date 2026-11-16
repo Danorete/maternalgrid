@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MaternalGrid</title><style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#F8FAFC; --card:#FFFFFF; --line:#E2E8F0; --line2:#F1F5F9;
+  --ink:#0F172A; --ink2:#334155; --ink3:#475569; --ink4:#64748B; --ink5:#94A3B8;
+  --crisis:#DC2626; --rescue:#16A34A; --safe:#E2E8F0;
+  --crit:#D32F2F; --crit-ink:#B71C1C; --crit-bg:#FEF2F2; --crit-br:#FECACA;
+  --amber:#F57C00; --amber-ink:#B45309; --amber-bg:#FFFBEB; --amber-br:#FDE68A;
+  --pos:#2E7D32; --pos-ink:#1B5E20; --pos-bg:#F0FDF4; --pos-br:#BBF7D0;
+  --teal:#00897B; --teal-ink:#00695C; --slate:#64748B;
+  --r:12px; --r-sm:8px; --r-lg:16px;
+  --sh:0 4px 6px -1px rgb(0 0 0/.05), 0 2px 4px -2px rgb(0 0 0/.05);
+  --sh-lg:0 10px 15px -3px rgb(0 0 0/.08), 0 4px 6px -4px rgb(0 0 0/.05);
+  --sh-xl:0 20px 25px -5px rgb(0 0 0/.12), 0 8px 10px -6px rgb(0 0 0/.08);
+  --map1:#FFF3E0;--map2:#FDBE73;--map3:#F57C00;--map4:#D32F2F;--map5:#7B1616;
+  --d1:#D32F2F;--d2:#F0928A;--d3:#E8EDF3;--d4:#86C295;--d5:#2E7D32;
+}
+html,body{height:auto;min-height:100vh;overflow-y:auto!important}
+body{background:var(--bg);color:var(--ink);display:block;
+  font-family:Inter,"SF Pro Display",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,system-ui,sans-serif;
+  font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased;
+  font-feature-settings:"cv02","cv03","cv04","tnum"}
+.num{font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+
+/* ── top bar ── */
+.topbar{position:sticky;top:0;z-index:40;background:var(--card);border-bottom:1px solid var(--line);
+  padding:9px 24px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.logo{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,#D32F2F,#F57C00);
+  display:grid;place-items:center;color:#fff;font-weight:700;font-size:15px;box-shadow:var(--sh)}
+.brand h1{font-size:16px;font-weight:700;letter-spacing:-.02em;line-height:1.2}
+.brand p{font-size:12px;color:var(--ink4);font-weight:500}
+.notice{margin-left:auto;display:flex;align-items:center;gap:7px;font-size:11.5px;font-weight:500;
+  color:var(--amber-ink);background:var(--amber-bg);border:1px solid var(--amber-br);
+  padding:6px 12px;border-radius:999px;max-width:520px}
+
+/* ── KPI strip ── */
+.strip{padding:12px 24px 0;display:grid;gap:10px;
+  grid-template-columns:repeat(6,minmax(0,1fr))}
+@media(max-width:1150px){.strip{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.tile{background:var(--card);border:1px solid var(--line);border-radius:var(--r);
+  box-shadow:var(--sh);padding:10px 14px;position:relative;overflow:hidden;transition:box-shadow .18s}
+.tile:hover{box-shadow:var(--sh-lg)}
+.tile::before{content:"";position:absolute;inset:0 auto 0 0;width:3px;background:var(--line);border-radius:3px}
+.tile.crit::before{background:var(--crit)} .tile.warn::before{background:var(--amber)}
+.tile.pos::before{background:var(--pos)}
+.tile .lab{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink4)}
+.tile .fig{font-size:23px;font-weight:700;letter-spacing:-.035em;line-height:1.15;margin-top:1px}
+.tile .foot{margin-top:4px;display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.tile .sub{font-size:11px;color:var(--ink5);font-weight:500}
+.pill{display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:650;
+  padding:2.5px 8px;border-radius:999px;border:1px solid transparent;white-space:nowrap}
+.pill.up{background:var(--crit-bg);color:var(--crit-ink);border-color:var(--crit-br)}
+.pill.down{background:var(--pos-bg);color:var(--pos-ink);border-color:var(--pos-br)}
+.pill.flat{background:var(--line2);color:var(--ink4);border-color:var(--line)}
+.pill.warn{background:var(--amber-bg);color:var(--amber-ink);border-color:var(--amber-br)}
+
+/* ── headline ── */
+.headline{margin:10px 24px 0;background:var(--card);border:1px solid var(--line);
+  border-left:4px solid var(--slate);border-radius:var(--r);box-shadow:var(--sh);padding:11px 16px}
+.headline.crit{border-left-color:var(--crit)} .headline.pos{border-left-color:var(--pos)}
+.headline.warn{border-left-color:var(--amber)}
+.headline p{font-size:14.5px;line-height:1.45;font-weight:500;max-width:112ch}
+.headline .meta{margin-top:6px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.tag{font-size:10.5px;font-weight:600;color:var(--ink4);background:var(--bg);
+  border:1px solid var(--line);padding:3px 9px;border-radius:6px}
+
+/* ── toolbar ── */
+.toolbar{display:none;padding:12px 24px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.seg{display:inline-flex;background:var(--card);border:1px solid var(--line);
+  border-radius:10px;padding:3px;box-shadow:var(--sh);gap:2px}
+.seg button{border:0;background:transparent;font:inherit;font-size:12.5px;font-weight:600;
+  color:var(--ink3);padding:6px 13px;border-radius:7px;cursor:pointer;transition:all .14s}
+.seg button:hover{background:var(--line2);color:var(--ink)}
+.seg button.on{background:var(--ink);color:#fff;box-shadow:var(--sh)}
+.seg button:focus-visible{outline:2px solid var(--teal);outline-offset:1px}
+.ctl{font:inherit;font-size:12.5px;font-weight:500;padding:7px 12px;border:1px solid var(--line);
+  border-radius:9px;background:var(--card);color:var(--ink);box-shadow:var(--sh);cursor:pointer;transition:all .14s}
+.ctl:hover{border-color:var(--ink5)} .ctl:focus-visible{outline:2px solid var(--teal);outline-offset:1px}
+select.ctl{min-width:228px} input.ctl{min-width:236px;cursor:text}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto}
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;
+  padding:5px 7px 5px 11px;border-radius:999px;border:1px solid var(--crit-br);
+  background:var(--crit-bg);color:var(--crit-ink)}
+.chip.add{background:var(--pos-bg);border-color:var(--pos-br);color:var(--pos-ink)}
+.chip button{border:0;background:transparent;color:inherit;cursor:pointer;font-size:14px;
+  line-height:1;padding:0 2px;opacity:.65} .chip button:hover{opacity:1}
+
+/* ── map ── */
+.main{display:grid;grid-template-columns:minmax(0,1fr) 392px;gap:14px;margin:10px 24px 20px;
+  align-items:start}
+@media(max-width:1180px){.main{grid-template-columns:minmax(0,1fr)}}
+.stage{position:relative;height:56vh;min-height:430px;
+  background:var(--card);border:1px solid var(--line);border-radius:var(--r);
+  box-shadow:var(--sh);overflow:hidden}
+#map{position:absolute;inset:0;width:100%;height:100%;display:block}
+/* side inspection panel — keeps the mouse beside the map on a projector */
+.side{background:var(--card);border:1px solid var(--line);border-radius:var(--r);
+  box-shadow:var(--sh);display:flex;flex-direction:column;height:56vh;min-height:430px;overflow:hidden}
+.side .sh{padding:13px 16px 0;flex:0 0 auto}
+.side .st{font-size:13.5px;font-weight:650}
+.side .sm{font-size:11.5px;color:var(--ink4);font-weight:500;margin-top:2px}
+.sbody{overflow:auto;padding:0 16px 76px;flex:1 1 auto}
+.sbody table{font-size:12px} .sbody th{padding:7px 8px;font-size:9.5px}
+.sbody td{padding:7px 8px}
+/* custom simulation drawer */
+.custom{margin:0 24px;background:var(--card);border:1px solid var(--line);border-radius:var(--r);
+  box-shadow:var(--sh);padding:13px 16px;display:none;gap:10px;align-items:center;flex-wrap:wrap}
+.custom.on{display:flex}
+.custom .lbl{font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--ink4)}
+.cell{stroke:#CBD5E1;stroke-width:.6;transition:fill .28s ease;cursor:pointer}
+.cell:hover{stroke:var(--ink);stroke-width:1.8}
+.cell.sel{stroke:var(--ink);stroke-width:2.2}
+.ledger{position:absolute;left:14px;bottom:14px;right:14px;width:auto;border-radius:10px;
+  background:rgba(255,255,255,.92);backdrop-filter:blur(8px) saturate(160%);
+  -webkit-backdrop-filter:blur(8px) saturate(160%);
+  border:1px solid rgba(226,232,240,.9);box-shadow:var(--sh-lg);padding:8px 12px;
+  display:flex;align-items:center;gap:10px 16px;flex-wrap:wrap}
+@media(prefers-reduced-transparency:reduce){.ledger{background:#fff;backdrop-filter:none}}
+.ledger h3{font-size:9.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
+  color:var(--ink4);margin:0;flex:0 0 auto}
+#leg,#legScen{display:flex;align-items:center;gap:6px 14px;flex-wrap:wrap}
+.lrow{display:inline-flex;align-items:center;gap:6px;padding:0;font-size:11.5px;white-space:nowrap}
+.dotpill{width:20px;height:9px;border-radius:999px;flex:0 0 auto;border:1px solid rgb(15 23 42/.12)}
+.lrow .t{flex:1;color:var(--ink2);font-weight:500}
+.lrow .n{font-weight:700;color:var(--ink)}
+.ldiv{width:1px;height:16px;background:var(--line);margin:0;flex:0 0 auto}
+.lkey{font-size:10px;color:var(--ink5);display:flex;gap:10px;font-weight:500;flex:0 0 auto}
+
+/* ── drawer ── */
+.drawer{display:none;margin:0 24px 16px;background:var(--card);border:1px solid var(--line);
+  border-radius:var(--r);box-shadow:var(--sh);display:flex;flex-direction:column;
+  max-height:34vh;overflow:hidden}
+.dhead{display:flex;align-items:center;gap:10px;padding:12px 18px;cursor:pointer;user-select:none}
+.dhead:hover{background:var(--bg)}
+.dhead .car{color:var(--ink4);font-size:11px;transition:transform .2s}
+.dhead.open .car{transform:rotate(180deg)}
+.dhead .ttl{font-size:13.5px;font-weight:650}
+.dhead .meta{margin-left:auto;font-size:12px;color:var(--ink4);font-weight:500}
+.dtabs{display:flex;gap:4px;padding:0 18px 10px}
+.dtab{font-size:12.5px;font-weight:600;padding:6px 13px;border-radius:999px;cursor:pointer;
+  color:var(--ink3);border:1px solid transparent;transition:all .14s}
+.dtab:hover{background:var(--line2)}
+.dtab.on{background:var(--ink);color:#fff}
+.dbody{overflow:auto;padding:0 18px 16px}
+table{width:100%;border-collapse:separate;border-spacing:0;font-size:12.5px}
+th.n{text-align:right}
+th{text-align:left;font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
+  color:#475569;padding:8px 10px;background:var(--bg);position:sticky;top:0;
+  border-bottom:1px solid var(--line)}
+th:first-child{border-radius:var(--r-sm) 0 0 0} th:last-child{border-radius:0 var(--r-sm) 0 0}
+td{padding:8px 10px;border-bottom:1px solid var(--line2);font-weight:500}
+tbody tr:nth-child(even) td{background:#FBFCFD}
+tbody tr:hover td{background:var(--line2)}
+td.n{text-align:right;font-variant-numeric:tabular-nums}
+.status{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:700;
+  padding:3px 9px;border-radius:999px;letter-spacing:.02em}
+.status.lost{background:var(--crit-bg);color:var(--crit-ink);border:1px solid var(--crit-br)}
+.status.gained{background:var(--pos-bg);color:var(--pos-ink);border:1px solid var(--pos-br)}
+.status.shifted{background:var(--amber-bg);color:var(--amber-ink);border:1px solid var(--amber-br)}
+.muted{color:var(--ink5)} .hide{display:none!important}
+.kv th{background:transparent;position:static;border:0;text-transform:none;letter-spacing:0;
+  font-size:11.5px;color:var(--ink4);width:190px;font-weight:600}
+.kv td{border-bottom:1px solid var(--line2)}
+.evid{margin-top:12px;background:var(--amber-bg);border:1px solid var(--amber-br);
+  border-radius:var(--r-sm);padding:11px 13px;font-size:12px;color:var(--ink2);line-height:1.6}
+.evid b{color:var(--amber-ink)}
+
+/* ── tooltip ── */
+#tip{position:fixed;z-index:1200;pointer-events:none;opacity:0;transition:opacity .12s;
+  background:rgba(15,23,42,.97);color:#fff;padding:9px 12px;border-radius:var(--r-sm);
+  font-size:12px;line-height:1.55;max-width:280px;box-shadow:var(--sh-xl)}
+#tip .m{color:#94A3B8} #tip .h{font-weight:700;font-size:12.5px}
+
+/* ── copilot ── */
+#fab{position:fixed;bottom:24px;right:24px;z-index:999;width:58px;height:58px;border-radius:50%;
+  border:0;cursor:pointer;background:linear-gradient(135deg,#00897B,#00695C);color:#fff;
+  font-size:23px;display:grid;place-items:center;box-shadow:0 10px 30px rgb(0 137 123/.45);
+  transition:transform .18s,box-shadow .18s}
+#fab:hover{transform:translateY(-2px) scale(1.04);box-shadow:0 14px 36px rgb(0 137 123/.55)}
+#fab:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+#fab .badge{position:absolute;top:1px;right:1px;width:13px;height:13px;border-radius:50%;
+  background:var(--crit);border:2.5px solid #fff}
+#fab .badge::after{content:"";position:absolute;inset:-2.5px;border-radius:50%;
+  border:2px solid var(--crit);animation:pulse 2.1s ease-out infinite}
+@keyframes pulse{0%{transform:scale(1);opacity:.85}100%{transform:scale(2.5);opacity:0}}
+@media(prefers-reduced-motion:reduce){#fab .badge::after{animation:none}}
+#panel{position:fixed;bottom:94px;right:24px;z-index:999;width:360px;max-height:min(520px,64vh);
+  border-radius:var(--r-lg);overflow:hidden;display:none;flex-direction:column;
+  background:rgba(255,255,255,.94);backdrop-filter:blur(14px) saturate(170%);
+  -webkit-backdrop-filter:blur(14px) saturate(170%);
+  border:1px solid rgba(226,232,240,.9);box-shadow:var(--sh-xl);
+  transform-origin:bottom right;animation:pop .2s cubic-bezier(.22,1,.36,1)}
+@keyframes pop{from{opacity:0;transform:scale(.93) translateY(10px)}to{opacity:1;transform:none}}
+#panel.on{display:flex}
+#panel.min{max-height:52px}
+#panel.min .plog,#panel.min .pquick,#panel.min .pfoot{display:none}
+.phead{background:linear-gradient(135deg,#00897B,#00695C);color:#fff;padding:14px 16px;
+  display:flex;align-items:center;gap:9px;flex:0 0 auto}
+.phead .nm{font-size:13.5px;font-weight:650;letter-spacing:-.01em}
+.phead .st{font-size:10.5px;opacity:.85;font-weight:500}
+.phead .acts{margin-left:auto;display:flex;gap:2px}
+.phead button{border:0;background:transparent;color:#fff;cursor:pointer;width:26px;height:26px;
+  border-radius:6px;font-size:15px;line-height:1;opacity:.85}
+.phead button:hover{background:rgb(255 255 255/.18);opacity:1}
+.plog{flex:1;overflow:auto;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.msg{max-width:87%;padding:10px 13px;border-radius:13px;font-size:12.8px;line-height:1.55}
+.msg.bot{background:#fff;border:1px solid var(--line);align-self:flex-start;
+  border-bottom-left-radius:4px;box-shadow:var(--sh)}
+.msg.me{background:var(--ink);color:#fff;align-self:flex-end;border-bottom-right-radius:4px}
+.msg .src{display:block;margin-top:7px;padding-top:7px;border-top:1px solid var(--line2);
+  font-size:10px;color:var(--ink5);font-weight:500}
+.msg.me .src{border-color:rgb(255 255 255/.18);color:#94A3B8}
+.pquick{display:flex;gap:5px;flex-wrap:wrap;padding:0 16px 10px;flex:0 0 auto}
+.pquick button{font:inherit;font-size:11px;font-weight:600;padding:5px 10px;border-radius:999px;
+  border:1px solid var(--line);background:#fff;color:var(--ink3);cursor:pointer;transition:all .14s}
+.pquick button:hover{border-color:var(--teal);color:var(--teal-ink);background:#F0FDFA}
+.pfoot{padding:11px 16px;border-top:1px solid var(--line);background:rgb(255 255 255/.75);flex:0 0 auto}
+.pfoot input{width:100%;font:inherit;font-size:12.5px;padding:9px 12px;border:1px solid var(--line);
+  border-radius:10px;background:#fff}
+.pfoot input:focus{outline:2px solid var(--teal);outline-offset:-1px;border-color:var(--teal)}
+
+/* ── executive tour ── */
+.tour{margin:10px 24px 0;background:var(--card);border:1px solid var(--line);
+  border-radius:var(--r);box-shadow:var(--sh);padding:10px 16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.tour .eyebrow{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink4)}
+.steps{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.step{display:inline-flex;align-items:center;gap:9px;padding:7px 15px 7px 8px;border-radius:999px;
+  border:1px solid var(--line);background:var(--card);cursor:pointer;font:inherit;font-size:12.5px;
+  font-weight:600;color:var(--ink3);transition:all .16s;white-space:nowrap}
+.step:hover{border-color:var(--ink5);background:var(--bg)}
+.step .idx{width:21px;height:21px;border-radius:50%;background:var(--line2);color:var(--ink4);
+  display:grid;place-items:center;font-size:11px;font-weight:700;flex:0 0 auto;transition:all .16s}
+.step.on{background:var(--ink);color:#fff;border-color:var(--ink);box-shadow:var(--sh)}
+.step.on .idx{background:rgb(255 255 255/.22);color:#fff}
+.step.s1.on{background:var(--crisis);border-color:var(--crisis)}
+.step.s2.on{background:var(--crit);border-color:var(--crit)}
+.step.s3.on{background:var(--rescue);border-color:var(--rescue)}
+.step:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+.tour .arrow{color:var(--ink5);font-size:13px}
+.tour .note{flex-basis:100%;order:9;margin:0;font-size:11.5px;color:var(--ink4);font-weight:500;line-height:1.35}
+.tile.anchor{border-color:#FCA5A5;background:linear-gradient(180deg,#FEF2F2 0%,#fff 46%)}
+.tile.anchor::before{background:var(--crisis)}
+.tile.anchor .lab{color:var(--crit-ink)}
+.crisisbadge{display:inline-flex;align-items:center;font-size:9px;font-weight:800;letter-spacing:.05em;
+  text-transform:uppercase;color:#fff;background:var(--crisis);padding:2px 6px;border-radius:999px;margin-left:5px;
+  vertical-align:1px}
+@keyframes ring{0%{stroke-opacity:.95;stroke-width:2.5}70%{stroke-opacity:0;stroke-width:9}100%{stroke-opacity:0;stroke-width:9}}
+.pulse{animation:ring 1.7s ease-out infinite;fill:none;pointer-events:none}
+@media(prefers-reduced-motion:reduce){.pulse{animation:none;stroke-opacity:.9;stroke-width:3}}
+.cmark{font:700 .13px Inter,sans-serif;text-anchor:middle;pointer-events:none;paint-order:stroke;
+  stroke:#fff;stroke-width:.035px;stroke-linejoin:round}
+#tip .tags{display:flex;gap:5px;flex-wrap:wrap;margin:7px 0 6px}
+#tip .tg{font-size:10px;font-weight:700;padding:2.5px 7px;border-radius:5px;letter-spacing:.02em}
+#tip .tg.bad{background:#DC2626;color:#fff} #tip .tg.ok{background:#16A34A;color:#fff}
+#tip .tg.warn{background:#F57C00;color:#fff} #tip .tg.n{background:#334155;color:#CBD5E1}
+#tip .kv{display:grid;grid-template-columns:auto 1fr;gap:3px 10px;font-size:11.5px;margin-top:5px}
+#tip .kv span:nth-child(odd){color:#94A3B8}
+
+.tour .spacer{margin-left:auto}
+.tour .mini{font:inherit;font-size:12px;font-weight:600;padding:6px 12px;border-radius:9px;
+  border:1px solid var(--line);background:var(--card);color:var(--ink3);cursor:pointer;transition:all .14s}
+.tour .mini:hover{border-color:var(--ink5);background:var(--bg)}
+.tour .mini.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.side .dtabs{padding:10px 0 10px}
+.side .dtab{font-size:11.5px;padding:5px 11px}
+.chips{margin-left:0}
+
+.sbody tr.sel td{background:#FEF2F2!important;box-shadow:inset 3px 0 0 var(--crisis)}
+.sbody tr.sel td:first-child{font-weight:700}
+.over{color:#DC2626;font-weight:700;font-variant-numeric:tabular-nums}
+.under{color:#1B5E20;font-weight:700;font-variant-numeric:tabular-nums}
+
+/* presentation mode: tuck the assistant away so it never sits over the table */
+#fabWrap{position:fixed;bottom:24px;right:24px;z-index:999;transition:transform .22s cubic-bezier(.22,1,.36,1),opacity .18s}
+#fabWrap.hid{transform:translateX(96px);opacity:0;pointer-events:none}
+#fab{position:static}
+#fabHide{position:absolute;top:-4px;left:-4px;width:22px;height:22px;border-radius:50%;border:1.5px solid var(--line);
+  background:#fff;color:var(--ink4);font-size:13px;line-height:1;cursor:pointer;display:none;
+  place-items:center;box-shadow:var(--sh);padding:0}
+#fabWrap:hover #fabHide{display:grid}
+#fabHide:hover{color:var(--crit-ink);border-color:var(--crit-br)}
+#fabShow{position:fixed;bottom:24px;right:0;z-index:998;display:none;align-items:center;gap:6px;
+  background:var(--teal);color:#fff;border:0;border-radius:10px 0 0 10px;padding:9px 11px 9px 13px;
+  font:inherit;font-size:11.5px;font-weight:650;cursor:pointer;box-shadow:var(--sh-lg)}
+#fabShow.on{display:flex}
+#fabShow:hover{padding-right:15px}
+</style></head><body>
+<div class="topbar">
+  <div class="logo">M</div>
+  <div class="brand"><h1>MaternalGrid</h1>
+    <p>Georgia labor &amp; delivery access simulation &middot; 159 counties &middot; 68 active facilities</p></div>
+  <div class="notice">&#9888;&#65039; AI-assisted scenario estimate from open Georgia health data (GDPH/OASIS). Modeled travel time &mdash; not routed drive time.</div>
+</div>
+
+<div class="strip" id="strip"></div>
+
+<div class="tour">
+  <span class="eyebrow">Executive demo tour</span>
+  <div class="steps">
+    <button class="step s1" data-step="1"><span class="idx">1</span>Current crisis</button>
+    <span class="arrow">&rarr;</span>
+    <button class="step s2" data-step="2"><span class="idx">2</span>Stress test &mdash; closure</button>
+    <span class="arrow">&rarr;</span>
+    <button class="step s3" data-step="3"><span class="idx">3</span>Strategic remedy &mdash; expansion</button>
+  </div>
+  <span class="spacer"></span>
+  <button class="mini" id="customBtn">Custom simulation &#9662;</button>
+  <div class="seg" id="modeSeg">
+    <button data-m="desert" class="on">Maternity deserts</button>
+    <button data-m="bands">Drive-time bands</button>
+    <button data-m="delta">Change</button>
+  </div>
+  <span class="note" id="tourNote">Start here &mdash; each step stages the scenario and flies the map to the affected region.</span>
+</div>
+<div class="custom" id="custom">
+  <span class="lbl">Custom simulation</span>
+  <input class="ctl" id="closeIn" list="faclist" placeholder="Close a facility&hellip;">
+  <datalist id="faclist"></datalist>
+  <select class="ctl" id="addSel"></select>
+  <button class="ctl" id="resetBtn">Reset to baseline</button>
+  <div class="chips" id="chips"></div>
+</div>
+<div class="headline" id="hl"><p id="hlText"></p><div class="meta" id="hlMeta"></div></div>
+
+
+</div>
+
+<div class="main">
+<div class="stage"><svg id="map"></svg>
+  <div class="ledger">
+    <h3 id="legTitle">Modeled drive time</h3>
+    <div id="leg"></div>
+    <div class="ldiv"></div>
+    <div id="legScen"></div>
+    <div class="ldiv"></div>
+    <div class="lkey"><span>&#9650; facility</span><span>&#10005; closed</span></div>
+    <div class="lkey">Voronoi catchments, not surveyed boundaries</div>
+  </div>
+</div>
+<aside class="side">
+  <div class="sh"><div class="st">Inspect</div><div class="sm" id="dmeta"></div>
+    <div class="dtabs" id="dtabs">
+      <div class="dtab on" data-t="changed">Changed</div>
+      <div class="dtab" data-t="absorb">Absorbing</div>
+      <div class="dtab" data-t="detail">County</div>
+    </div></div>
+  <div class="sbody" id="dbody"></div>
+</aside>
+</div>
+
+
+</div>
+
+<div id="tip"></div>
+<div id="fabWrap">
+  <button id="fab" aria-expanded="false" aria-controls="panel" aria-label="Open MaternalGrid assistant">
+    &#128172;<span class="badge"></span></button>
+  <button id="fabHide" title="Hide assistant for presenting" aria-label="Hide assistant">&times;</button>
+</div>
+<button id="fabShow" title="Show assistant" aria-label="Show assistant">&#128172; Assistant</button>
+<div id="panel" role="dialog" aria-label="MaternalGrid assistant">
+  <div class="phead"><div><div class="nm">MaternalGrid Assistant</div>
+      <div class="st">Grounded on GDPH/OASIS &middot; planning only</div></div>
+    <div class="acts"><button id="pMin" aria-label="Minimize">&minus;</button>
+      <button id="pClose" aria-label="Close">&times;</button></div></div>
+  <div class="plog" id="plog"></div>
+  <div class="pquick">
+    <button data-q="What is a maternity care desert?">What is a desert?</button>
+    <button data-q="Why 30 minutes?">Why 30 min?</button>
+    <button data-q="Where is the biggest gap?">Biggest gap</button>
+    <button data-q="Where does this data come from?">Sources</button>
+    <button data-q="How is travel time calculated?">Methodology</button>
+  </div>
+  <div class="pfoot"><input id="pIn" placeholder="Ask about access, methodology, or a county&hellip;"></div>
+</div>
+<script>
+const DATA={"meta":{"title":"MaternalGrid \u2014 Georgia maternity care access","model":{"method":"haversine_road_factor","road_factor":1.3,"avg_mph":45.0,"earth_radius_miles":3958.7613,"access_threshold_minutes":30.0,"note":"Modeled travel time, NOT routed drive time. No traffic, weather, or time of day."},"sources":{"births":"Georgia DPH OASIS, births by county of residence, 2015-2024","tiers":"March of Dimes Maternity Care Desert report, 2026","facilities":"MaternalGrid workspace roster (GA DPH designations + border anchors)"},"disclaimer":"AI-assisted scenario estimate based on open-source Georgia health data (GDPH/OASIS). Educated scenario for planning, not a deterministic health guarantee. Models geographic access, not clinical outcomes.","confidence_grade":"B","clinical_evidence":[{"band":"31-60 min","finding":"1.96x adjusted risk of unplanned out-of-hospital birth"},{"band":">60 min","finding":"3.19x adjusted risk of unplanned out-of-hospital birth"},{"band":">80 km (~50 mi)","finding":"+53% adjusted risk of severe maternal morbidity"},{"band":"per doubling of distance","finding":"-5% likelihood of timely prenatal care"}],"threshold_note":"30 minutes is a conservative OPERATIONAL planning threshold, not a published clinical cut-point. It sits below the first measured risk tier."},"verified_baseline":{"counties":159,"counties_beyond_30min":74,"pct_beyond_30min":46.5,"births_beyond_30min":13029,"births_total_2024":126304,"births_total_2015":131333,"avg_minutes_birth_weighted":11.1,"mod_deserts":70,"pct_mod_desert":44.0,"active_facilities":68,"in_state_active":62,"border_active":6,"in_state_closed":4,"trend_note":"Statewide births fell 3.8% 2015-2024. Desert counties averaged -4.0%; non-desert +0.6%.","desert_births_share_pct":7.8,"access_metrics_are_distinct":{"no_birthing_facility":{"n":108,"pct":67.9,"source":"GA DPH 2025"},"ob_gyn_shortage":{"n":82,"pct":51.6,"source":"GA Board of Health Care Workforce 2024"},"maternity_care_desert":{"n":70,"pct":44.0,"source":"March of Dimes 2026"}}},"palette":{"critical":"#D32F2F","critical_text":"#B71C1C","warning":"#F57C00","warning_text":"#B45309","positive":"#2E7D32","positive_alt":"#00897B","positive_text":"#00695C","neutral":"#64748B","surface":"#F8FAFC","ink":"#0F172A","WARNING":"#F57C00 is 2.70:1 on white and FAILS WCAG AA as text. Use it for fills only; use warning_text for any amber text."},"counties":[{"geoid":"13001","name":"Appling","lat":31.74853,"lon":-82.28947,"births":232,"births2015":272,"tier":"desert","desert":true},{"geoid":"13003","name":"Atkinson","lat":31.29634,"lon":-82.87551,"births":134,"births2015":142,"tier":"desert","desert":true},{"geoid":"13005","name":"Bacon","lat":31.55252,"lon":-82.4527,"births":173,"births2015":157,"tier":"full","desert":false},{"geoid":"13007","name":"Baker","lat":31.32633,"lon":-84.44282,"births":33,"births2015":27,"tier":"desert","desert":true},{"geoid":"13009","name":"Baldwin","lat":33.07175,"lon":-83.25126,"births":408,"births2015":475,"tier":"full","desert":false},{"geoid":"13011","name":"Banks","lat":34.35836,"lon":-83.49996,"births":262,"births2015":221,"tier":"desert","desert":true},{"geoid":"13013","name":"Barrow","lat":33.99175,"lon":-83.71437,"births":1287,"births2015":1065,"tier":"low","desert":false},{"geoid":"13015","name":"Bartow","lat":34.23916,"lon":-84.83819,"births":1522,"births2015":1290,"tier":"full","desert":false},{"geoid":"13017","name":"Ben Hill","lat":31.76207,"lon":-83.21811,"births":194,"births2015":237,"tier":"low","desert":false},{"geoid":"13019","name":"Berrien","lat":31.2774,"lon":-83.22696,"births":219,"births2015":248,"tier":"desert","desert":true},{"geoid":"13021","name":"Bibb","lat":32.80301,"lon":-83.69189,"births":1921,"births2015":2148,"tier":"full","desert":false},{"geoid":"13023","name":"Bleckley","lat":32.43684,"lon":-83.32816,"births":133,"births2015":118,"tier":"desert","desert":true},{"geoid":"13025","name":"Brantley","lat":31.19956,"lon":-81.97553,"births":219,"births2015":230,"tier":"desert","desert":true},{"geoid":"13027","name":"Brooks","lat":30.84239,"lon":-83.57926,"births":202,"births2015":186,"tier":"desert","desert":true},{"geoid":"13029","name":"Bryan","lat":32.01375,"lon":-81.44354,"births":564,"births2015":510,"tier":"full","desert":false},{"geoid":"13031","name":"Bulloch","lat":32.39515,"lon":-81.74971,"births":899,"births2015":895,"tier":"full","desert":false},{"geoid":"13033","name":"Burke","lat":33.06041,"lon":-81.99845,"births":287,"births2015":319,"tier":"desert","desert":true},{"geoid":"13035","name":"Butts","lat":33.28502,"lon":-83.95519,"births":284,"births2015":246,"tier":"desert","desert":true},{"geoid":"13037","name":"Calhoun","lat":31.52807,"lon":-84.6267,"births":41,"births2015":55,"tier":"desert","desert":true},{"geoid":"13039","name":"Camden","lat":30.92928,"lon":-81.66929,"births":728,"births2015":795,"tier":"full","desert":false},{"geoid":"13043","name":"Candler","lat":32.39834,"lon":-82.07656,"births":129,"births2015":139,"tier":"desert","desert":true},{"geoid":"13045","name":"Carroll","lat":33.58414,"lon":-85.08417,"births":1502,"births2015":1449,"tier":"full","desert":false},{"geoid":"13047","name":"Catoosa","lat":34.8988,"lon":-85.1376,"births":676,"births2015":727,"tier":"full","desert":false},{"geoid":"13049","name":"Charlton","lat":30.78533,"lon":-82.13757,"births":93,"births2015":117,"tier":"desert","desert":true},{"geoid":"13051","name":"Chatham","lat":32.00347,"lon":-81.13292,"births":3646,"births2015":4102,"tier":"full","desert":false},{"geoid":"13053","name":"Chattahoochee","lat":32.34458,"lon":-84.79247,"births":165,"births2015":206,"tier":"full","desert":false},{"geoid":"13055","name":"Chattooga","lat":34.47406,"lon":-85.34506,"births":256,"births2015":312,"tier":"desert","desert":true},{"geoid":"13057","name":"Cherokee","lat":34.24177,"lon":-84.47493,"births":3352,"births2015":2791,"tier":"full","desert":false},{"geoid":"13059","name":"Clarke","lat":33.95198,"lon":-83.35712,"births":1264,"births2015":1354,"tier":"full","desert":false},{"geoid":"13061","name":"Clay","lat":31.62596,"lon":-84.98089,"births":22,"births2015":27,"tier":"desert","desert":true},{"geoid":"13063","name":"Clayton","lat":33.54721,"lon":-84.36558,"births":3627,"births2015":4341,"tier":"full","desert":false},{"geoid":"13065","name":"Clinch","lat":30.91369,"lon":-82.70397,"births":80,"births2015":103,"tier":"full","desert":false},{"geoid":"13067","name":"Cobb","lat":33.94145,"lon":-84.57631,"births":8672,"births2015":9463,"tier":"full","desert":false},{"geoid":"13069","name":"Coffee","lat":31.54838,"lon":-82.85296,"births":565,"births2015":550,"tier":"full","desert":false},{"geoid":"13071","name":"Colquitt","lat":31.18889,"lon":-83.76715,"births":613,"births2015":609,"tier":"full","desert":false},{"geoid":"13073","name":"Columbia","lat":33.5438,"lon":-82.26475,"births":1740,"births2015":1785,"tier":"full","desert":false},{"geoid":"13075","name":"Cook","lat":31.1587,"lon":-83.42722,"births":232,"births2015":216,"tier":"desert","desert":true},{"geoid":"13077","name":"Coweta","lat":33.35283,"lon":-84.76724,"births":1752,"births2015":1595,"tier":"full","desert":false},{"geoid":"13079","name":"Crawford","lat":32.71746,"lon":-83.98389,"births":99,"births2015":119,"tier":"desert","desert":true},{"geoid":"13081","name":"Crisp","lat":31.92198,"lon":-83.7703,"births":249,"births2015":323,"tier":"full","desert":false},{"geoid":"13083","name":"Dade","lat":34.85782,"lon":-85.50356,"births":128,"births2015":169,"tier":"desert","desert":true},{"geoid":"13085","name":"Dawson","lat":34.43967,"lon":-84.1649,"births":439,"births2015":237,"tier":"full","desert":false},{"geoid":"13087","name":"Decatur","lat":30.87774,"lon":-84.57668,"births":360,"births2015":377,"tier":"low","desert":false},{"geoid":"13089","name":"DeKalb","lat":33.76946,"lon":-84.22425,"births":9723,"births2015":11182,"tier":"full","desert":false},{"geoid":"13091","name":"Dodge","lat":32.16999,"lon":-83.16943,"births":168,"births2015":229,"tier":"full","desert":false},{"geoid":"13093","name":"Dooly","lat":32.1558,"lon":-83.79792,"births":108,"births2015":108,"tier":"desert","desert":true},{"geoid":"13095","name":"Dougherty","lat":31.53145,"lon":-84.21895,"births":1031,"births2015":1198,"tier":"full","desert":false},{"geoid":"13097","name":"Douglas","lat":33.70281,"lon":-84.7693,"births":1634,"births2015":1857,"tier":"full","desert":false},{"geoid":"13099","name":"Early","lat":31.32004,"lon":-84.90366,"births":101,"births2015":145,"tier":"desert","desert":true},{"geoid":"13101","name":"Echols","lat":30.71156,"lon":-82.89762,"births":46,"births2015":58,"tier":"desert","desert":true},{"geoid":"13103","name":"Effingham","lat":32.36578,"lon":-81.34127,"births":870,"births2015":790,"tier":"low","desert":false},{"geoid":"13105","name":"Elbert","lat":34.11528,"lon":-82.83694,"births":212,"births2015":211,"tier":"desert","desert":true},{"geoid":"13107","name":"Emanuel","lat":32.59012,"lon":-82.30242,"births":256,"births2015":303,"tier":"desert","desert":true},{"geoid":"13109","name":"Evans","lat":32.15682,"lon":-81.88533,"births":157,"births2015":140,"tier":"desert","desert":true},{"geoid":"13111","name":"Fannin","lat":34.86602,"lon":-84.31707,"births":245,"births2015":217,"tier":"desert","desert":true},{"geoid":"13113","name":"Fayette","lat":33.41033,"lon":-84.49116,"births":889,"births2015":848,"tier":"full","desert":false},{"geoid":"13115","name":"Floyd","lat":34.26775,"lon":-85.21052,"births":1175,"births2015":1248,"tier":"full","desert":false},{"geoid":"13117","name":"Forsyth","lat":34.22722,"lon":-84.1228,"births":2523,"births2015":2350,"tier":"full","desert":false},{"geoid":"13119","name":"Franklin","lat":34.37267,"lon":-83.23551,"births":319,"births2015":269,"tier":"full","desert":false},{"geoid":"13121","name":"Fulton","lat":33.78799,"lon":-84.46726,"births":11137,"births2015":12593,"tier":"full","desert":false},{"geoid":"13123","name":"Gilmer","lat":34.69071,"lon":-84.45281,"births":339,"births2015":344,"tier":"low","desert":false},{"geoid":"13125","name":"Glascock","lat":33.23895,"lon":-82.60654,"births":32,"births2015":21,"tier":"desert","desert":true},{"geoid":"13127","name":"Glynn","lat":31.2345,"lon":-81.53861,"births":912,"births2015":982,"tier":"full","desert":false},{"geoid":"13129","name":"Gordon","lat":34.50833,"lon":-84.8714,"births":690,"births2015":705,"tier":"full","desert":false},{"geoid":"13131","name":"Grady","lat":30.87479,"lon":-84.23425,"births":300,"births2015":329,"tier":"full","desert":false},{"geoid":"13133","name":"Greene","lat":33.58267,"lon":-83.16911,"births":182,"births2015":177,"tier":"low","desert":false},{"geoid":"13135","name":"Gwinnett","lat":33.96232,"lon":-84.02209,"births":11624,"births2015":11949,"tier":"full","desert":false},{"geoid":"13137","name":"Habersham","lat":34.63053,"lon":-83.52889,"births":559,"births2015":471,"tier":"full","desert":false},{"geoid":"13139","name":"Hall","lat":34.3182,"lon":-83.81623,"births":3098,"births2015":2754,"tier":"full","desert":false},{"geoid":"13141","name":"Hancock","lat":33.27437,"lon":-83.00024,"births":58,"births2015":67,"tier":"desert","desert":true},{"geoid":"13143","name":"Haralson","lat":33.79615,"lon":-85.20987,"births":411,"births2015":365,"tier":"low","desert":false},{"geoid":"13145","name":"Harris","lat":32.73481,"lon":-84.91278,"births":327,"births2015":297,"tier":"full","desert":false},{"geoid":"13147","name":"Hart","lat":34.34796,"lon":-82.9625,"births":265,"births2015":284,"tier":"low","desert":false},{"geoid":"13149","name":"Heard","lat":33.29743,"lon":-85.12908,"births":130,"births2015":114,"tier":"desert","desert":true},{"geoid":"13151","name":"Henry","lat":33.45722,"lon":-84.16277,"births":2639,"births2015":2404,"tier":"full","desert":false},{"geoid":"13153","name":"Houston","lat":32.45686,"lon":-83.66718,"births":2035,"births2015":2089,"tier":"full","desert":false},{"geoid":"13155","name":"Irwin","lat":31.604,"lon":-83.27852,"births":96,"births2015":92,"tier":"desert","desert":true},{"geoid":"13157","name":"Jackson","lat":34.13541,"lon":-83.56825,"births":1160,"births2015":795,"tier":"full","desert":false},{"geoid":"13159","name":"Jasper","lat":33.31492,"lon":-83.6885,"births":176,"births2015":156,"tier":"full","desert":false},{"geoid":"13161","name":"Jeff Davis","lat":31.80492,"lon":-82.63525,"births":202,"births2015":211,"tier":"desert","desert":true},{"geoid":"13163","name":"Jefferson","lat":33.05654,"lon":-82.41671,"births":137,"births2015":203,"tier":"desert","desert":true},{"geoid":"13165","name":"Jenkins","lat":32.79274,"lon":-81.96175,"births":79,"births2015":89,"tier":"desert","desert":true},{"geoid":"13167","name":"Johnson","lat":32.70856,"lon":-82.65896,"births":89,"births2015":86,"tier":"desert","desert":true},{"geoid":"13169","name":"Jones","lat":33.02339,"lon":-83.56041,"births":295,"births2015":285,"tier":"moderate","desert":false},{"geoid":"13171","name":"Lamar","lat":33.08249,"lon":-84.14434,"births":229,"births2015":215,"tier":"desert","desert":true},{"geoid":"13173","name":"Lanier","lat":31.03766,"lon":-83.06617,"births":148,"births2015":141,"tier":"desert","desert":true},{"geoid":"13175","name":"Laurens","lat":32.46563,"lon":-82.92068,"births":637,"births2015":626,"tier":"full","desert":false},{"geoid":"13177","name":"Lee","lat":31.78154,"lon":-84.14464,"births":341,"births2015":347,"tier":"full","desert":false},{"geoid":"13179","name":"Liberty","lat":31.82402,"lon":-81.49136,"births":1283,"births2015":1442,"tier":"full","desert":false},{"geoid":"13181","name":"Lincoln","lat":33.79176,"lon":-82.44895,"births":71,"births2015":88,"tier":"desert","desert":true},{"geoid":"13183","name":"Long","lat":31.74806,"lon":-81.74648,"births":364,"births2015":302,"tier":"desert","desert":true},{"geoid":"13185","name":"Lowndes","lat":30.83292,"lon":-83.26707,"births":1530,"births2015":1619,"tier":"full","desert":false},{"geoid":"13187","name":"Lumpkin","lat":34.57058,"lon":-84.00271,"births":370,"births2015":274,"tier":"full","desert":false},{"geoid":"13189","name":"McDuffie","lat":33.47431,"lon":-82.48024,"births":244,"births2015":280,"tier":"desert","desert":true},{"geoid":"13191","name":"McIntosh","lat":31.49272,"lon":-81.4083,"births":104,"births2015":110,"tier":"full","desert":false},{"geoid":"13193","name":"Macon","lat":32.35801,"lon":-84.04422,"births":128,"births2015":133,"tier":"desert","desert":true},{"geoid":"13195","name":"Madison","lat":34.13028,"lon":-83.2133,"births":399,"births2015":333,"tier":"desert","desert":true},{"geoid":"13197","name":"Marion","lat":32.35437,"lon":-84.52827,"births":69,"births2015":87,"tier":"desert","desert":true},{"geoid":"13199","name":"Meriwether","lat":33.03984,"lon":-84.68581,"births":246,"births2015":260,"tier":"low","desert":false},{"geoid":"13201","name":"Miller","lat":31.16499,"lon":-84.7308,"births":65,"births2015":70,"tier":"desert","desert":true},{"geoid":"13205","name":"Mitchell","lat":31.22428,"lon":-84.19394,"births":222,"births2015":279,"tier":"desert","desert":true},{"geoid":"13207","name":"Monroe","lat":33.01003,"lon":-83.91996,"births":287,"births2015":247,"tier":"full","desert":false},{"geoid":"13209","name":"Montgomery","lat":32.17298,"lon":-82.52867,"births":109,"births2015":87,"tier":"desert","desert":true},{"geoid":"13211","name":"Morgan","lat":33.59034,"lon":-83.48863,"births":222,"births2015":184,"tier":"desert","desert":true},{"geoid":"13213","name":"Murray","lat":34.78957,"lon":-84.7468,"births":487,"births2015":468,"tier":"low","desert":false},{"geoid":"13215","name":"Muscogee","lat":32.50992,"lon":-84.87622,"births":2471,"births2015":3021,"tier":"full","desert":false},{"geoid":"13217","name":"Newton","lat":33.55702,"lon":-83.85128,"births":1414,"births2015":1339,"tier":"full","desert":false},{"geoid":"13219","name":"Oconee","lat":33.83998,"lon":-83.43605,"births":343,"births2015":352,"tier":"full","desert":false},{"geoid":"13221","name":"Oglethorpe","lat":33.88065,"lon":-83.07578,"births":198,"births2015":181,"tier":"desert","desert":true},{"geoid":"13223","name":"Paulding","lat":33.91999,"lon":-84.86314,"births":2101,"births2015":1853,"tier":"low","desert":false},{"geoid":"13225","name":"Peach","lat":32.57317,"lon":-83.82464,"births":282,"births2015":285,"tier":"desert","desert":true},{"geoid":"13227","name":"Pickens","lat":34.46518,"lon":-84.46761,"births":324,"births2015":302,"tier":"full","desert":false},{"geoid":"13229","name":"Pierce","lat":31.35988,"lon":-82.21365,"births":240,"births2015":260,"tier":"full","desert":false},{"geoid":"13231","name":"Pike","lat":33.09436,"lon":-84.38571,"births":216,"births2015":147,"tier":"desert","desert":true},{"geoid":"13233","name":"Polk","lat":34.00395,"lon":-85.18442,"births":579,"births2015":529,"tier":"low","desert":false},{"geoid":"13235","name":"Pulaski","lat":32.22624,"lon":-83.47004,"births":88,"births2015":84,"tier":"full","desert":false},{"geoid":"13237","name":"Putnam","lat":33.32487,"lon":-83.37253,"births":236,"births2015":242,"tier":"low","desert":false},{"geoid":"13239","name":"Quitman","lat":31.86544,"lon":-85.02093,"births":14,"births2015":30,"tier":"desert","desert":true},{"geoid":"13241","name":"Rabun","lat":34.88235,"lon":-83.4073,"births":145,"births2015":155,"tier":"full","desert":false},{"geoid":"13243","name":"Randolph","lat":31.76106,"lon":-84.75532,"births":71,"births2015":82,"tier":"desert","desert":true},{"geoid":"13245","name":"Richmond","lat":33.35901,"lon":-82.07374,"births":2596,"births2015":2884,"tier":"full","desert":false},{"geoid":"13247","name":"Rockdale","lat":33.65168,"lon":-84.03362,"births":953,"births2015":1034,"tier":"full","desert":false},{"geoid":"13249","name":"Schley","lat":32.26394,"lon":-84.31651,"births":48,"births2015":50,"tier":"desert","desert":true},{"geoid":"13251","name":"Screven","lat":32.75042,"lon":-81.61176,"births":171,"births2015":176,"tier":"desert","desert":true},{"geoid":"13253","name":"Seminole","lat":30.94052,"lon":-84.86557,"births":111,"births2015":81,"tier":"full","desert":false},{"geoid":"13255","name":"Spalding","lat":33.26549,"lon":-84.28651,"births":786,"births2015":807,"tier":"full","desert":false},{"geoid":"13257","name":"Stephens","lat":34.54981,"lon":-83.29044,"births":314,"births2015":346,"tier":"full","desert":false},{"geoid":"13259","name":"Stewart","lat":32.07666,"lon":-84.83764,"births":32,"births2015":37,"tier":"desert","desert":true},{"geoid":"13261","name":"Sumter","lat":32.04031,"lon":-84.19645,"births":344,"births2015":367,"tier":"full","desert":false},{"geoid":"13263","name":"Talbot","lat":32.69882,"lon":-84.5365,"births":55,"births2015":47,"tier":"desert","desert":true},{"geoid":"13265","name":"Taliaferro","lat":33.56763,"lon":-82.87877,"births":16,"births2015":14,"tier":"desert","desert":true},{"geoid":"13267","name":"Tattnall","lat":32.04382,"lon":-82.05133,"births":268,"births2015":257,"tier":"desert","desert":true},{"geoid":"13269","name":"Taylor","lat":32.55735,"lon":-84.24741,"births":62,"births2015":78,"tier":"desert","desert":true},{"geoid":"13271","name":"Telfair","lat":31.93127,"lon":-82.93299,"births":100,"births2015":127,"tier":"desert","desert":true},{"geoid":"13273","name":"Terrell","lat":31.77445,"lon":-84.44392,"births":83,"births2015":111,"tier":"desert","desert":true},{"geoid":"13275","name":"Thomas","lat":30.86389,"lon":-83.91857,"births":516,"births2015":546,"tier":"full","desert":false},{"geoid":"13277","name":"Tift","lat":31.45821,"lon":-83.52535,"births":584,"births2015":584,"tier":"full","desert":false},{"geoid":"13279","name":"Toombs","lat":32.11935,"lon":-82.32497,"births":352,"births2015":402,"tier":"full","desert":false},{"geoid":"13281","name":"Towns","lat":34.91488,"lon":-83.74005,"births":85,"births2015":86,"tier":"desert","desert":true},{"geoid":"13283","name":"Treutlen","lat":32.40277,"lon":-82.56613,"births":87,"births2015":78,"tier":"desert","desert":true},{"geoid":"13285","name":"Troup","lat":33.03302,"lon":-85.02971,"births":902,"births2015":934,"tier":"full","desert":false},{"geoid":"13287","name":"Turner","lat":31.71363,"lon":-83.62407,"births":115,"births2015":117,"tier":"full","desert":false},{"geoid":"13289","name":"Twiggs","lat":32.66566,"lon":-83.42137,"births":65,"births2015":91,"tier":"desert","desert":true},{"geoid":"13291","name":"Union","lat":34.82914,"lon":-83.98797,"births":212,"births2015":171,"tier":"full","desert":false},{"geoid":"13293","name":"Upson","lat":32.87947,"lon":-84.30143,"births":280,"births2015":320,"tier":"full","desert":false},{"geoid":"13295","name":"Walker","lat":34.73432,"lon":-85.30158,"births":737,"births2015":783,"tier":"low","desert":false},{"geoid":"13297","name":"Walton","lat":33.77972,"lon":-83.73282,"births":1205,"births2015":1032,"tier":"low","desert":false},{"geoid":"13299","name":"Ware","lat":31.05868,"lon":-82.42212,"births":417,"births2015":501,"tier":"full","desert":false},{"geoid":"13301","name":"Warren","lat":33.4091,"lon":-82.67806,"births":59,"births2015":51,"tier":"desert","desert":true},{"geoid":"13303","name":"Washington","lat":32.97164,"lon":-82.79371,"births":187,"births2015":240,"tier":"desert","desert":true},{"geoid":"13305","name":"Wayne","lat":31.55098,"lon":-81.92138,"births":359,"births2015":403,"tier":"low","desert":false},{"geoid":"13307","name":"Webster","lat":32.04475,"lon":-84.55402,"births":12,"births2015":29,"tier":"desert","desert":true},{"geoid":"13309","name":"Wheeler","lat":32.12276,"lon":-82.72567,"births":57,"births2015":59,"tier":"desert","desert":true},{"geoid":"13311","name":"White","lat":34.64285,"lon":-83.74793,"births":275,"births2015":281,"tier":"low","desert":false},{"geoid":"13313","name":"Whitfield","lat":34.8133,"lon":-84.96127,"births":1261,"births2015":1444,"tier":"full","desert":false},{"geoid":"13315","name":"Wilcox","lat":31.96878,"lon":-83.43641,"births":81,"births2015":83,"tier":"desert","desert":true},{"geoid":"13317","name":"Wilkes","lat":33.77957,"lon":-82.73958,"births":112,"births2015":121,"tier":"desert","desert":true},{"geoid":"13319","name":"Wilkinson","lat":32.80254,"lon":-83.17238,"births":102,"births2015":92,"tier":"desert","desert":true},{"geoid":"13321","name":"Worth","lat":31.54932,"lon":-83.8524,"births":194,"births2015":253,"tier":"desert","desert":true}],"facilities":[{"id":"ga_grady_memorial_hospital","name":"Grady Memorial Hospital","city":"Atlanta","state":"GA","border":false,"level":"IV","status":"active","lat":33.7527,"lon":-84.3785},{"id":"ga_emory_university_hospital_midtown","name":"Emory University Hospital Midtown","city":"Atlanta","state":"GA","border":false,"level":"IV","status":"active","lat":33.7683,"lon":-84.3839},{"id":"ga_northside_hospital_atlanta","name":"Northside Hospital Atlanta","city":"Sandy Springs","state":"GA","border":false,"level":"IV","status":"active","lat":33.9304,"lon":-84.3538},{"id":"ga_wellstar_kennestone_regional_medical_center","name":"Wellstar Kennestone Regional Medical Center","city":"Marietta","state":"GA","border":false,"level":"III","status":"active","lat":33.9598,"lon":-84.5285},{"id":"ga_wellstar_cobb_medical_center","name":"Wellstar Cobb Medical Center","city":"Austell","state":"GA","border":false,"level":"III","status":"active","lat":33.8137,"lon":-84.6347},{"id":"ga_northside_hospital_gwinnett","name":"Northside Hospital Gwinnett","city":"Lawrenceville","state":"GA","border":false,"level":"III","status":"active","lat":33.9562,"lon":-83.9879},{"id":"ga_northside_hospital_cherokee","name":"Northside Hospital Cherokee","city":"Canton","state":"GA","border":false,"level":"II","status":"active","lat":34.2367,"lon":-84.4908},{"id":"ga_northside_hospital_forsyth","name":"Northside Hospital Forsyth","city":"Cumming","state":"GA","border":false,"level":"III","status":"active","lat":34.2073,"lon":-84.1402},{"id":"ga_emory_decatur_hospital","name":"Emory Decatur Hospital","city":"Decatur","state":"GA","border":false,"level":"II","status":"active","lat":33.7898,"lon":-84.2963},{"id":"ga_piedmont_henry_hospital","name":"Piedmont Henry Hospital","city":"Stockbridge","state":"GA","border":false,"level":"II","status":"active","lat":33.5443,"lon":-84.2338},{"id":"ga_piedmont_rockdale_hospital","name":"Piedmont Rockdale Hospital","city":"Conyers","state":"GA","border":false,"level":"II","status":"active","lat":33.6676,"lon":-84.0177},{"id":"ga_piedmont_eastside_medical_center","name":"Piedmont Eastside Medical Center","city":"Snellville","state":"GA","border":false,"level":"II","status":"active","lat":33.8573,"lon":-84.0199},{"id":"ga_piedmont_fayette_hospital","name":"Piedmont Fayette Hospital","city":"Fayetteville","state":"GA","border":false,"level":"II","status":"active","lat":33.4487,"lon":-84.4549},{"id":"ga_piedmont_newnan_hospital","name":"Piedmont Newnan Hospital","city":"Newnan","state":"GA","border":false,"level":"II","status":"active","lat":33.3807,"lon":-84.7997},{"id":"ga_piedmont_newton_hospital","name":"Piedmont Newton Hospital","city":"Covington","state":"GA","border":false,"level":"I","status":"active","lat":33.5968,"lon":-83.8602},{"id":"ga_piedmont_walton_hospital","name":"Piedmont Walton Hospital","city":"Monroe","state":"GA","border":false,"level":"I","status":"active","lat":33.7948,"lon":-83.7132},{"id":"ga_wellstar_douglas_medical_center","name":"Wellstar Douglas Medical Center","city":"Douglasville","state":"GA","border":false,"level":"II","status":"active","lat":33.7515,"lon":-84.7477},{"id":"ga_southern_regional_medical_center","name":"Southern Regional Medical Center","city":"Riverdale","state":"GA","border":false,"level":"II","status":"active","lat":33.5726,"lon":-84.4132},{"id":"ga_tanner_medical_center_carrollton","name":"Tanner Medical Center Carrollton","city":"Carrollton","state":"GA","border":false,"level":"II","status":"active","lat":33.5801,"lon":-85.0766},{"id":"ga_tanner_medical_center_villa_rica","name":"Tanner Medical Center Villa Rica","city":"Villa Rica","state":"GA","border":false,"level":"I","status":"active","lat":33.7321,"lon":-84.9177},{"id":"ga_wellstar_paulding_medical_center","name":"Wellstar Paulding Medical Center","city":"Hiram","state":"GA","border":false,"level":"II","status":"active","lat":33.8721,"lon":-84.7594},{"id":"ga_northeast_georgia_medical_center_gainesville","name":"Northeast Georgia Medical Center Gainesville","city":"Gainesville","state":"GA","border":false,"level":"III","status":"active","lat":34.2979,"lon":-83.8241},{"id":"ga_northeast_georgia_medical_center_braselton","name":"Northeast Georgia Medical Center Braselton","city":"Braselton","state":"GA","border":false,"level":"II","status":"active","lat":34.1087,"lon":-83.7635},{"id":"ga_northeast_georgia_medical_center_barrow","name":"Northeast Georgia Medical Center Barrow","city":"Winder","state":"GA","border":false,"level":"I","status":"active","lat":33.9926,"lon":-83.7202},{"id":"ga_hamilton_medical_center","name":"Hamilton Medical Center","city":"Dalton","state":"GA","border":false,"level":"III","status":"active","lat":34.7698,"lon":-84.9702},{"id":"ga_adventhealth_gordon","name":"AdventHealth Gordon","city":"Calhoun","state":"GA","border":false,"level":"II","status":"active","lat":34.5023,"lon":-84.951},{"id":"ga_atrium_health_floyd_medical_center","name":"Atrium Health Floyd Medical Center","city":"Rome","state":"GA","border":false,"level":"III","status":"active","lat":34.257,"lon":-85.1647},{"id":"ga_piedmont_cartersville_medical_center","name":"Piedmont Cartersville Medical Center","city":"Cartersville","state":"GA","border":false,"level":"II","status":"active","lat":34.1651,"lon":-84.7999},{"id":"ga_union_general_hospital","name":"Union General Hospital","city":"Blairsville","state":"GA","border":false,"level":"I","status":"active","lat":34.8762,"lon":-83.9582},{"id":"ga_northeast_georgia_medical_center_habersham","name":"Northeast Georgia Medical Center Habersham","city":"Demorest","state":"GA","border":false,"level":"I","status":"active","lat":34.5651,"lon":-83.546},{"id":"ga_stephens_county_hospital","name":"Stephens County Hospital","city":"Toccoa","state":"GA","border":false,"level":"I","status":"active","lat":34.5773,"lon":-83.3324},{"id":"ga_sacred_heart_medical_center_lavonia","name":"Sacred Heart Medical Center Lavonia","city":"Lavonia","state":"GA","border":false,"level":"I","status":"active","lat":34.4368,"lon":-83.1063},{"id":"ga_piedmont_athens_regional_medical_center","name":"Piedmont Athens Regional Medical Center","city":"Athens","state":"GA","border":false,"level":"III","status":"active","lat":33.9519,"lon":-83.3576},{"id":"ga_st_marys_hospital_athens","name":"St Marys Hospital Athens","city":"Athens","state":"GA","border":false,"level":"II","status":"active","lat":33.9636,"lon":-83.3931},{"id":"ga_augusta_university_medical_center","name":"Augusta University Medical Center","city":"Augusta","state":"GA","border":false,"level":"IV","status":"active","lat":33.4711,"lon":-81.9865},{"id":"ga_doctors_hospital_of_augusta","name":"Doctors Hospital of Augusta","city":"Augusta","state":"GA","border":false,"level":"II","status":"active","lat":33.4869,"lon":-82.0748},{"id":"ga_wellstar_mcg_health_thomson","name":"Wellstar MCG Health Thomson","city":"Thomson","state":"GA","border":false,"level":"I","status":"active","lat":33.4712,"lon":-82.5043},{"id":"ga_elbert_memorial_hospital","name":"Elbert Memorial Hospital","city":"Elberton","state":"GA","border":false,"level":"I","status":"closed","lat":34.1112,"lon":-82.8687},{"id":"ga_atrium_health_navicent_the_medical_center","name":"Atrium Health Navicent The Medical Center","city":"Macon","state":"GA","border":false,"level":"IV","status":"active","lat":32.8329,"lon":-83.6394},{"id":"ga_atrium_health_navicent_baldwin","name":"Atrium Health Navicent Baldwin","city":"Milledgeville","state":"GA","border":false,"level":"I","status":"active","lat":33.0801,"lon":-83.2321},{"id":"ga_houston_healthcare_perry_hospital","name":"Houston Healthcare Perry Hospital","city":"Warner Robins","state":"GA","border":false,"level":"II","status":"active","lat":32.613,"lon":-83.6242},{"id":"ga_fairview_park_hospital","name":"Fairview Park Hospital","city":"Dublin","state":"GA","border":false,"level":"II","status":"active","lat":32.5404,"lon":-82.9038},{"id":"ga_wellstar_spalding_regional_hospital","name":"Wellstar Spalding Regional Hospital","city":"Griffin","state":"GA","border":false,"level":"II","status":"active","lat":33.2468,"lon":-84.2641},{"id":"ga_wellstar_west_georgia_medical_center","name":"Wellstar West Georgia Medical Center","city":"LaGrange","state":"GA","border":false,"level":"II","status":"active","lat":33.0362,"lon":-85.0322},{"id":"ga_washington_county_regional_medical_center","name":"Washington County Regional Medical Center","city":"Sandersville","state":"GA","border":false,"level":"I","status":"closed","lat":32.9807,"lon":-82.8115},{"id":"ga_piedmont_columbus_regional_midtown","name":"Piedmont Columbus Regional Midtown","city":"Columbus","state":"GA","border":false,"level":"III","status":"active","lat":32.4866,"lon":-84.9583},{"id":"ga_st_francis_emory_healthcare","name":"St Francis Emory Healthcare","city":"Columbus","state":"GA","border":false,"level":"II","status":"active","lat":32.4838,"lon":-84.9394},{"id":"ga_phoebe_putney_memorial_hospital","name":"Phoebe Putney Memorial Hospital","city":"Albany","state":"GA","border":false,"level":"IV","status":"active","lat":31.5837,"lon":-84.1502},{"id":"ga_phoebe_sumter_medical_center","name":"Phoebe Sumter Medical Center","city":"Americus","state":"GA","border":false,"level":"I","status":"active","lat":32.0724,"lon":-84.2327},{"id":"ga_crisp_regional_hospital","name":"Crisp Regional Hospital","city":"Cordele","state":"GA","border":false,"level":"I","status":"active","lat":31.9635,"lon":-83.7824},{"id":"ga_colquitt_regional_medical_center","name":"Colquitt Regional Medical Center","city":"Moultrie","state":"GA","border":false,"level":"II","status":"active","lat":31.1799,"lon":-83.789},{"id":"ga_memorial_hospital_and_manor","name":"Memorial Hospital and Manor","city":"Bainbridge","state":"GA","border":false,"level":"I","status":"active","lat":30.9038,"lon":-84.5755},{"id":"ga_archbold_memorial_hospital","name":"Archbold Memorial Hospital","city":"Thomasville","state":"GA","border":false,"level":"III","status":"active","lat":30.8366,"lon":-83.9788},{"id":"ga_south_georgia_medical_center","name":"South Georgia Medical Center","city":"Valdosta","state":"GA","border":false,"level":"III","status":"active","lat":30.839,"lon":-83.2805},{"id":"ga_tift_regional_medical_center","name":"Tift Regional Medical Center","city":"Tifton","state":"GA","border":false,"level":"III","status":"active","lat":31.4505,"lon":-83.5085},{"id":"ga_coffee_regional_medical_center","name":"Coffee Regional Medical Center","city":"Douglas","state":"GA","border":false,"level":"I","status":"active","lat":31.5088,"lon":-82.8504},{"id":"ga_dorminy_medical_center","name":"Dorminy Medical Center","city":"Fitzgerald","state":"GA","border":false,"level":"I","status":"closed","lat":31.7149,"lon":-83.2526},{"id":"ga_memorial_satilla_health","name":"Memorial Satilla Health","city":"Waycross","state":"GA","border":false,"level":"II","status":"active","lat":31.2136,"lon":-82.354},{"id":"ga_memorial_health_university_medical_center","name":"Memorial Health University Medical Center","city":"Savannah","state":"GA","border":false,"level":"IV","status":"active","lat":32.0217,"lon":-81.0912},{"id":"ga_st_josephs_candler","name":"St Josephs Candler","city":"Savannah","state":"GA","border":false,"level":"III","status":"active","lat":32.0093,"lon":-81.1204},{"id":"ga_east_georgia_regional_medical_center","name":"East Georgia Regional Medical Center","city":"Statesboro","state":"GA","border":false,"level":"II","status":"active","lat":32.4488,"lon":-81.7832},{"id":"ga_memorial_health_meadows_hospital","name":"Memorial Health Meadows Hospital","city":"Vidalia","state":"GA","border":false,"level":"I","status":"active","lat":32.2177,"lon":-82.4135},{"id":"ga_wayne_memorial_hospital","name":"Wayne Memorial Hospital","city":"Jesup","state":"GA","border":false,"level":"I","status":"closed","lat":31.6074,"lon":-81.8854},{"id":"ga_liberty_regional_medical_center","name":"Liberty Regional Medical Center","city":"Hinesville","state":"GA","border":false,"level":"I","status":"active","lat":31.8469,"lon":-81.596},{"id":"ga_southeast_georgia_health_system_brunswick","name":"Southeast Georgia Health System Brunswick","city":"Brunswick","state":"GA","border":false,"level":"III","status":"active","lat":31.1499,"lon":-81.4915},{"id":"ga_southeast_georgia_health_system_camden","name":"Southeast Georgia Health System Camden","city":"St Marys","state":"GA","border":false,"level":"I","status":"active","lat":30.8005,"lon":-81.6898},{"id":"b_erlanger_baroness_hospital","name":"Erlanger Baroness Hospital","city":"Chattanooga","state":"TN","border":true,"level":"III","status":"active","lat":35.0439,"lon":-85.2953},{"id":"b_prisma_health_greenville_memorial","name":"Prisma Health Greenville Memorial","city":"Greenville","state":"SC","border":true,"level":"III","status":"active","lat":34.821,"lon":-82.4212},{"id":"b_anmed_health_medical_center","name":"AnMed Health Medical Center","city":"Anderson","state":"SC","border":true,"level":"II","status":"active","lat":34.5034,"lon":-82.6501},{"id":"b_tallahassee_memorial_healthcare","name":"Tallahassee Memorial HealthCare","city":"Tallahassee","state":"FL","border":true,"level":"III","status":"active","lat":30.4569,"lon":-84.261},{"id":"b_uf_health_jacksonville","name":"UF Health Jacksonville","city":"Jacksonville","state":"FL","border":true,"level":"III","status":"active","lat":30.3505,"lon":-81.6608},{"id":"b_southeast_health_medical_center","name":"Southeast Health Medical Center","city":"Dothan","state":"AL","border":true,"level":"II","status":"active","lat":31.2232,"lon":-85.3905}]}, CELLS={"kx":0.841511,"bbox":[-72.1993,30.4645,-68.0271,35.162],"cells":[[[-69.3641,31.9257],[-69.4053,31.713],[-69.1857,31.5591],[-69.1463,31.5656],[-69.019,31.7652],[-69.0189,31.8091],[-69.2092,31.9382]],[[-69.4935,31.2963],[-69.5,31.3373],[-69.5515,31.4088],[-69.898,31.4349],[-69.8833,31.2057],[-69.7011,31.0927],[-69.5725,31.1412],[-69.4996,31.2583]],[[-69.5541,31.6224],[-69.5515,31.4088],[-69.5,31.3373],[-69.4612,31.3175],[-69.4229,31.3114],[-69.1857,31.5591],[-69.4053,31.713]],[[-71.0424,31.4997],[-71.2459,31.3436],[-71.0789,31.0928],[-71.0476,31.0849],[-70.9064,31.3747]],[[-70.2075,33.1582],[-70.1601,32.9035],[-69.8769,32.9733],[-69.8519,33.0695],[-70.0124,33.2368]],[[-70.147,34.2428],[-70.1594,34.437],[-70.2268,34.4991],[-70.3928,34.4842],[-70.4184,34.4655],[-70.3891,34.2712],[-70.1728,34.2154]],[[-70.4913,34.1545],[-70.5931,34.1277],[-70.5666,33.894],[-70.3537,33.8784],[-70.297,33.9659],[-70.2944,33.986]],[[-71.5392,34.3599],[-71.5586,34.1472],[-71.5097,34.0866],[-71.3052,34.0732],[-71.2384,34.1226],[-71.2404,34.3578],[-71.2628,34.3886]],[[-69.992,31.9644],[-70.0077,31.966],[-70.207,31.7888],[-70.1985,31.7294],[-69.8922,31.6309],[-69.825,31.7276]],[[-70.1944,31.3227],[-70.0469,31.1134],[-69.8833,31.2057],[-69.898,31.4349],[-69.9189,31.4592],[-70.1149,31.4332]],[[-70.2446,32.8491],[-70.4658,32.9601],[-70.5824,32.852],[-70.5339,32.7126],[-70.3739,32.6348]],[[-70.2592,32.5175],[-70.2688,32.3812],[-70.0956,32.283],[-69.9424,32.3597],[-69.9614,32.5858],[-70.0096,32.6031]],[[-69.0027,31.3807],[-69.1817,31.157],[-69.1296,31.0182],[-68.9611,30.9627],[-68.7907,31.1252],[-68.8127,31.3561]],[[-70.1967,30.9713],[-70.3622,31.0383],[-70.4652,30.9913],[-70.4905,30.6549],[-70.4781,30.6425],[-70.4092,30.6074],[-70.3328,30.5953],[-70.2565,30.6074],[-70.2089,30.6316]],[[-68.6347,32.2245],[-68.6796,32.1942],[-68.7632,31.977],[-68.7444,31.9589],[-68.4097,31.8879],[-68.3987,32.1668]],[[-68.8477,32.6095],[-68.9287,32.5732],[-68.9317,32.315],[-68.6796,32.1942],[-68.6347,32.2245],[-68.6085,32.5314]],[[-68.7555,33.0604],[-68.7676,33.1368],[-68.8027,33.2057],[-68.8466,33.2495],[-69.1799,33.1788],[-69.1769,32.9047],[-68.799,32.9483],[-68.7706,32.9782],[-68.7676,32.9841]],[[-70.6676,33.441],[-70.7914,33.3154],[-70.7853,33.2282],[-70.6769,33.1429],[-70.5183,33.16],[-70.5508,33.4034]],[[-71.1871,31.6823],[-71.3542,31.6047],[-71.3913,31.4918],[-71.2626,31.3476],[-71.2459,31.3436],[-71.0424,31.4997],[-71.0433,31.5926]],[[-68.4785,30.9293],[-68.4906,31.0056],[-68.4977,31.0196],[-68.7907,31.1252],[-68.9611,30.9627],[-68.8788,30.7373],[-68.8708,30.7294],[-68.8019,30.6943],[-68.7256,30.6822],[-68.6492,30.6943],[-68.5803,30.7294],[-68.5257,30.784],[-68.4906,30.8529]],[[-69.053,32.6036],[-69.2745,32.3841],[-69.275,32.3354],[-69.1176,32.2175],[-69.0741,32.2201],[-68.9317,32.315],[-68.9287,32.5732]],[[-71.8448,33.594],[-71.8463,33.5841],[-71.8343,33.5078],[-71.8132,33.4665],[-71.5031,33.4256],[-71.4148,33.5274],[-71.5177,33.7572]],[[-71.4553,35.0551],[-71.499,35.0987],[-71.5679,35.1338],[-71.6442,35.1459],[-71.7206,35.1338],[-71.7895,35.0987],[-71.823,35.0651],[-71.7996,34.8891],[-71.632,34.7484]],[[-68.9611,30.9627],[-69.1296,31.0182],[-69.3621,30.8145],[-69.3668,30.7853],[-69.3547,30.709],[-69.3196,30.6401],[-69.2649,30.5854],[-69.196,30.5503],[-69.1197,30.5382],[-69.0433,30.5503],[-68.9744,30.5854],[-68.9197,30.6401],[-68.8846,30.709],[-68.8797,30.7399]],[[-68.0271,32.0035],[-68.0392,32.0798],[-68.0743,32.1487],[-68.129,32.2034],[-68.1979,32.2385],[-68.2376,32.2448],[-68.3987,32.1668],[-68.4097,31.8879],[-68.3374,31.7664],[-68.2742,31.7564],[-68.1979,31.7685],[-68.129,31.8036],[-68.0743,31.8582],[-68.0392,31.9271]],[[-71.5997,32.3374],[-71.5888,32.2682],[-71.574,32.2392],[-71.2547,32.1939],[-71.2363,32.2061],[-71.2487,32.4871]],[[-71.9875,34.6305],[-72.0182,34.6198],[-72.0187,34.6193],[-72.0538,34.5504],[-72.0659,34.4741],[-72.0538,34.3977],[-72.0187,34.3288],[-71.964,34.2742],[-71.9508,34.2674],[-71.616,34.4511],[-71.6271,34.5798]],[[-71.2404,34.3578],[-71.2384,34.1226],[-70.9479,34.0401],[-70.9346,34.3123],[-70.9633,34.3502]],[[-70.1748,34.1018],[-70.2944,33.986],[-70.297,33.9659],[-70.0557,33.8228],[-70.0061,33.9873]],[[-71.4614,31.7552],[-71.7404,31.716],[-71.7473,31.7023],[-71.7594,31.626],[-71.7473,31.5496],[-71.7122,31.4807],[-71.6652,31.4336],[-71.3913,31.4918],[-71.3542,31.6047]],[[-70.8623,33.6194],[-70.9863,33.6857],[-71.1658,33.6219],[-71.1833,33.5837],[-70.958,33.4097],[-70.8561,33.6029]],[[-69.5725,31.1412],[-69.7011,31.0927],[-69.7811,30.8959],[-69.5148,30.6813],[-69.451,30.7138],[-69.3964,30.7684],[-69.3728,30.8147]],[[-70.9421,34.0281],[-70.9483,34.0402],[-71.2384,34.1226],[-71.3052,34.0732],[-71.2848,33.8437],[-71.227,33.8043],[-70.9611,33.9633],[-70.9408,33.9984]],[[-69.825,31.7276],[-69.8922,31.6309],[-69.9189,31.4592],[-69.898,31.4349],[-69.5515,31.4088],[-69.5541,31.6224],[-69.7258,31.745]],[[-70.6571,31.3432],[-70.6833,31.0768],[-70.4652,30.9913],[-70.3622,31.0383],[-70.3363,31.2836],[-70.4656,31.3813]],[[-68.9869,33.5901],[-68.9917,33.6202],[-69.0268,33.689],[-69.0814,33.7437],[-69.1372,33.7721],[-69.3639,33.6305],[-69.258,33.3542]],[[-70.3363,31.2836],[-70.3622,31.0383],[-70.1967,30.9713],[-70.0851,31.0175],[-70.0469,31.1134],[-70.1944,31.3227]],[[-71.4148,33.5274],[-71.5031,33.4256],[-71.4633,33.207],[-71.4119,33.1715],[-71.1771,33.2229],[-71.2527,33.5282]],[[-70.8497,32.728],[-70.7162,32.5432],[-70.5339,32.7126],[-70.5824,32.852],[-70.7552,32.8838]],[[-70.3709,32.0522],[-70.6589,32.0236],[-70.6882,31.9349],[-70.6058,31.75],[-70.5609,31.7417],[-70.3409,31.8717]],[[-71.8232,35.066],[-71.8758,35.0928],[-71.9522,35.1049],[-72.0285,35.0928],[-72.0974,35.0577],[-72.1521,35.0031],[-72.1872,34.9342],[-72.1993,34.8578],[-72.1872,34.7815],[-72.1521,34.7126],[-72.0974,34.6579],[-72.0285,34.6228],[-72.0155,34.6208],[-71.9875,34.6305],[-71.7996,34.8891]],[[-70.8784,34.6312],[-70.9412,34.5706],[-70.9633,34.3502],[-70.9346,34.3123],[-70.6896,34.3532],[-70.6661,34.4099]],[[-71.0476,31.0849],[-71.0789,31.0928],[-71.2684,31.0072],[-71.3461,30.7065],[-71.3174,30.6778],[-71.2485,30.6427],[-71.1722,30.6306],[-71.0958,30.6427],[-71.0302,30.6762],[-71.0262,31.065]],[[-70.9408,33.9984],[-70.9611,33.9633],[-70.9863,33.6857],[-70.8623,33.6194],[-70.7243,33.8074]],[[-69.7881,32.2504],[-69.9424,32.3597],[-70.0956,32.283],[-70.1346,32.1076],[-70.0077,31.966],[-69.992,31.9644],[-69.8045,32.1206]],[[-70.4028,32.2848],[-70.5432,32.3361],[-70.7083,32.1669],[-70.6589,32.0236],[-70.3709,32.0522],[-70.3515,32.0838]],[[-70.7219,31.627],[-70.9318,31.6795],[-71.0433,31.5926],[-71.0424,31.4997],[-70.9064,31.3747],[-70.7081,31.3883]],[[-71.5172,33.7592],[-71.5177,33.7572],[-71.4148,33.5274],[-71.2527,33.5282],[-71.1833,33.5837],[-71.1658,33.6219],[-71.227,33.8043],[-71.2848,33.8437]],[[-71.6632,31.4341],[-71.6824,31.3964],[-71.6944,31.32],[-71.6824,31.2437],[-71.6473,31.1748],[-71.5926,31.1201],[-71.5867,31.1172],[-71.5005,31.1244],[-71.2626,31.3476],[-71.3913,31.4918]],[[-69.9795,30.6062],[-69.9591,30.5663],[-69.9045,30.5117],[-69.8356,30.4766],[-69.7592,30.4645],[-69.6829,30.4766],[-69.614,30.5117],[-69.5593,30.5663],[-69.5242,30.6352],[-69.5167,30.6828],[-69.7811,30.8959],[-69.8838,30.8513]],[[-68.2025,32.3658],[-68.2145,32.4421],[-68.2496,32.511],[-68.3043,32.5657],[-68.3732,32.6008],[-68.4496,32.6129],[-68.4786,32.6083],[-68.6085,32.5314],[-68.6347,32.2245],[-68.3987,32.1668],[-68.2372,32.245],[-68.2145,32.2894]],[[-69.4611,34.1153],[-69.4732,34.1916],[-69.5083,34.2605],[-69.5629,34.3152],[-69.5696,34.3186],[-69.8636,34.185],[-69.87,34.0505],[-69.7314,33.9318],[-69.5139,33.9848],[-69.4868,34.0122],[-69.4732,34.0389]],[[-69.213,32.83],[-69.2475,32.8355],[-69.3427,32.8159],[-69.4371,32.5767],[-69.2745,32.3841],[-69.053,32.6036]],[[-68.856,31.9504],[-68.7632,31.977],[-68.6796,32.1942],[-68.9317,32.315],[-69.0741,32.2201]],[[-70.7888,35.0462],[-70.8085,35.0659],[-70.8774,35.101],[-70.9537,35.1131],[-71.0301,35.101],[-71.099,35.0659],[-71.1536,35.0113],[-71.1675,34.984],[-71.1422,34.8639],[-70.8624,34.6816],[-70.834,34.7071]],[[-71.2527,33.5282],[-71.1771,33.2229],[-71.1708,33.2201],[-71.0954,33.2412],[-70.9573,33.4055],[-70.958,33.4097],[-71.1833,33.5837]],[[-71.616,34.4511],[-71.9525,34.2665],[-71.9406,34.1914],[-71.9055,34.1225],[-71.9016,34.1186],[-71.5586,34.1472],[-71.5392,34.3599]],[[-70.6896,34.3532],[-70.9346,34.3123],[-70.9479,34.0401],[-70.9469,34.0388],[-70.9411,34.0329],[-70.6136,34.1377]],[[-70.1594,34.437],[-70.147,34.2428],[-69.9396,34.2588],[-69.9136,34.5012]],[[-70.9611,33.9633],[-71.227,33.8043],[-71.1658,33.6219],[-70.9863,33.6857]],[[-71.2462,34.6036],[-71.2376,34.587],[-70.9412,34.5706],[-70.8784,34.6312],[-70.8624,34.6816],[-71.1422,34.8639]],[[-69.6778,33.2768],[-69.69,33.1624],[-69.5272,33.0665],[-69.2861,33.2776],[-69.4572,33.3549]],[[-68.3685,31.2345],[-68.3766,31.2854],[-68.7333,31.4369],[-68.8127,31.3561],[-68.7907,31.1252],[-68.4989,31.02],[-68.4704,31.0346],[-68.4157,31.0893],[-68.3806,31.1581]],[[-71.5983,34.626],[-71.6271,34.5798],[-71.616,34.4511],[-71.5392,34.3599],[-71.2628,34.3886],[-71.2376,34.587],[-71.2462,34.6036],[-71.4229,34.6695]],[[-70.7443,31.0376],[-71.0262,31.065],[-71.0302,30.6758],[-71.0293,30.6749],[-70.9604,30.6398],[-70.884,30.6277],[-70.8077,30.6398],[-70.7596,30.6643]],[[-69.8574,33.7077],[-70.047,33.7576],[-70.1191,33.6947],[-70.125,33.4881],[-69.9867,33.3962],[-69.8733,33.4485]],[[-70.9414,34.0328],[-70.9421,34.0285],[-70.9408,33.9984],[-70.7243,33.8074],[-70.6336,33.8046],[-70.5666,33.894],[-70.5931,34.1277],[-70.6136,34.1377]],[[-70.1396,34.7159],[-70.3399,34.7973],[-70.3733,34.7765],[-70.3928,34.4842],[-70.2268,34.4991]],[[-70.6661,34.4099],[-70.6896,34.3532],[-70.6136,34.1377],[-70.5931,34.1277],[-70.4913,34.1545],[-70.3891,34.2712],[-70.4184,34.4655],[-70.5417,34.4873]],[[-69.8733,33.4485],[-69.9867,33.3962],[-70.0124,33.2368],[-69.8519,33.0695],[-69.69,33.1624],[-69.6778,33.2768],[-69.74,33.402]],[[-71.9144,33.9227],[-71.94,33.8725],[-71.9521,33.7961],[-71.94,33.7198],[-71.9049,33.6509],[-71.8503,33.5962],[-71.8454,33.5937],[-71.5177,33.7572],[-71.5172,33.7592],[-71.5716,33.8874]],[[-71.2828,32.8393],[-71.4059,32.9164],[-71.683,32.8249],[-71.69,32.8112],[-71.7021,32.7348],[-71.69,32.6585],[-71.6565,32.5927],[-71.3053,32.6407]],[[-69.5667,34.348],[-69.5788,34.4243],[-69.6139,34.4932],[-69.6686,34.5479],[-69.7375,34.583],[-69.8138,34.5951],[-69.849,34.5895],[-69.9136,34.5012],[-69.9396,34.2588],[-69.8636,34.185],[-69.5715,34.3177]],[[-71.5031,33.4256],[-71.8131,33.4665],[-71.8369,33.4427],[-71.872,33.3738],[-71.8841,33.2974],[-71.872,33.2211],[-71.8369,33.1522],[-71.7888,33.104],[-71.4633,33.207]],[[-70.8561,33.6029],[-70.958,33.4097],[-70.9573,33.4055],[-70.7914,33.3154],[-70.6676,33.441],[-70.695,33.5128]],[[-70.3725,32.6297],[-70.566,32.4092],[-70.5432,32.3361],[-70.4028,32.2848],[-70.2688,32.3812],[-70.2592,32.5175]],[[-69.8922,31.6309],[-70.1985,31.7294],[-70.242,31.6142],[-70.1149,31.4332],[-69.9189,31.4592]],[[-70.1728,34.2154],[-70.3891,34.2712],[-70.4913,34.1545],[-70.2944,33.986],[-70.1748,34.1018]],[[-70.2958,33.4252],[-70.3999,33.4888],[-70.5508,33.4034],[-70.5183,33.16],[-70.4733,33.1313],[-70.2873,33.2]],[[-69.7258,31.745],[-69.5541,31.6224],[-69.4053,31.713],[-69.3641,31.9257],[-69.418,31.9705],[-69.4827,31.9863],[-69.6208,31.9532]],[[-69.2837,33.2779],[-69.2861,33.2776],[-69.5272,33.0665],[-69.482,32.8975],[-69.3427,32.8159],[-69.2531,32.8343],[-69.2103,32.8561],[-69.1769,32.9047],[-69.1799,33.1788]],[[-68.799,32.9483],[-69.1769,32.9047],[-69.2083,32.8591],[-69.2129,32.8299],[-69.053,32.6036],[-68.9287,32.5732],[-68.8477,32.6095]],[[-69.7876,32.695],[-69.6087,32.5328],[-69.4371,32.5767],[-69.3427,32.8159],[-69.482,32.8975],[-69.7706,32.7731]],[[-70.4658,32.9601],[-70.2446,32.8491],[-70.1834,32.8691],[-70.1601,32.9035],[-70.2075,33.1582],[-70.2873,33.2],[-70.4733,33.1313]],[[-70.7661,32.9104],[-70.6769,33.1429],[-70.7853,33.2282],[-70.9064,33.149],[-70.9147,33.0072]],[[-69.7011,31.0927],[-69.8833,31.2057],[-70.0469,31.1134],[-70.0851,31.0175],[-69.8838,30.8513],[-69.7811,30.8959]],[[-69.9614,32.5858],[-69.9424,32.3597],[-69.7881,32.2504],[-69.6547,32.3142],[-69.6087,32.5328],[-69.7876,32.695]],[[-70.9318,31.6795],[-70.7219,31.627],[-70.6058,31.75],[-70.6882,31.9349],[-70.9378,31.8928]],[[-68.4097,31.8879],[-68.7444,31.9589],[-68.6313,31.6393],[-68.3677,31.6949],[-68.3409,31.7477],[-68.3378,31.7671]],[[-69.1346,33.7918],[-69.1467,33.8681],[-69.1818,33.937],[-69.2364,33.9917],[-69.3053,34.0268],[-69.3817,34.0389],[-69.458,34.0268],[-69.4869,34.012],[-69.5139,33.9848],[-69.4968,33.6415],[-69.3639,33.6305],[-69.1377,33.7718]],[[-68.7444,31.9589],[-68.7632,31.977],[-68.856,31.9504],[-69.0189,31.8091],[-69.019,31.7652],[-68.7192,31.5413],[-68.6313,31.6393]],[[-70.0851,31.0175],[-70.1967,30.9713],[-70.209,30.6298],[-70.1465,30.5979],[-70.0701,30.5858],[-69.9938,30.5979],[-69.98,30.6049],[-69.8838,30.8513]],[[-70.834,34.7071],[-70.8624,34.6816],[-70.8784,34.6312],[-70.6661,34.4099],[-70.5417,34.4873],[-70.6122,34.6965]],[[-69.4572,33.3549],[-69.2861,33.2776],[-69.2837,33.2779],[-69.258,33.3542],[-69.3639,33.6305],[-69.4968,33.6415],[-69.5534,33.601],[-69.5535,33.6007]],[[-68.2589,31.4927],[-68.271,31.5691],[-68.3061,31.638],[-68.3607,31.6926],[-68.3659,31.6953],[-68.6313,31.6393],[-68.7192,31.5413],[-68.7333,31.4369],[-68.3759,31.2851],[-68.3607,31.2928],[-68.3061,31.3475],[-68.271,31.4164]],[[-70.8757,32.401],[-70.7937,32.2014],[-70.7083,32.1669],[-70.5432,32.3361],[-70.566,32.4092],[-70.716,32.538]],[[-70.147,34.2428],[-70.1728,34.2154],[-70.1748,34.1018],[-70.0061,33.9873],[-69.87,34.0505],[-69.8636,34.185],[-69.9396,34.2588]],[[-71.0751,32.5278],[-71.2287,32.5247],[-71.2487,32.4871],[-71.2363,32.2061],[-71.0995,32.1966],[-70.9848,32.4227]],[[-71.1708,33.2201],[-71.1771,33.2229],[-71.4119,33.1715],[-71.4059,32.9164],[-71.2828,32.8393],[-71.135,32.8937],[-71.1108,32.9424]],[[-71.2684,31.0072],[-71.0789,31.0928],[-71.2459,31.3436],[-71.2626,31.3476],[-71.5005,31.1244]],[[-70.7081,31.3883],[-70.9064,31.3747],[-71.0476,31.0849],[-71.0262,31.065],[-70.7443,31.0376],[-70.6833,31.0768],[-70.6571,31.3432]],[[-70.4733,33.1313],[-70.5183,33.16],[-70.6769,33.1429],[-70.7661,32.9104],[-70.7552,32.8838],[-70.5824,32.852],[-70.4658,32.9601]],[[-69.4827,31.9863],[-69.418,31.9705],[-69.3122,32.3088],[-69.5697,32.2734]],[[-70.4148,33.6249],[-70.3999,33.4888],[-70.2958,33.4252],[-70.125,33.4881],[-70.1191,33.6947],[-70.3179,33.73]],[[-71.1683,34.9877],[-71.1701,34.9895],[-71.239,35.0246],[-71.3153,35.0367],[-71.3759,35.0271],[-71.4229,34.6695],[-71.2462,34.6036],[-71.1422,34.8639]],[[-71.3053,32.6407],[-71.656,32.5928],[-71.6593,32.5863],[-71.6714,32.5099],[-71.6593,32.4336],[-71.6242,32.3647],[-71.5978,32.3383],[-71.2487,32.4871],[-71.2287,32.5247]],[[-70.5801,33.6989],[-70.695,33.5128],[-70.6676,33.441],[-70.5508,33.4034],[-70.3999,33.4888],[-70.4148,33.6249]],[[-70.297,33.9659],[-70.3537,33.8784],[-70.3179,33.73],[-70.1191,33.6947],[-70.047,33.7576],[-70.0557,33.8228]],[[-70.0061,33.9873],[-70.0557,33.8228],[-70.047,33.7576],[-69.8574,33.7077],[-69.8007,33.7377],[-69.7314,33.9318],[-69.87,34.0505]],[[-71.3052,34.0732],[-71.5097,34.0866],[-71.5716,33.8874],[-71.5172,33.7592],[-71.2848,33.8437]],[[-70.3739,32.6348],[-70.5339,32.7126],[-70.7162,32.5432],[-70.716,32.538],[-70.566,32.4092],[-70.3725,32.6297]],[[-71.2628,34.3886],[-71.2404,34.3578],[-70.9633,34.3502],[-70.9412,34.5706],[-71.2376,34.587]],[[-69.1463,31.5656],[-69.1857,31.5591],[-69.4231,31.3112],[-69.4207,31.2962],[-69.1817,31.157],[-69.0027,31.3807]],[[-70.9147,33.0072],[-70.9064,33.149],[-71.0954,33.2412],[-71.1708,33.2201],[-71.1108,32.9424]],[[-71.899,34.1188],[-71.9186,34.0803],[-71.9307,34.004],[-71.9186,33.9276],[-71.9162,33.9229],[-71.5716,33.8874],[-71.5097,34.0866],[-71.5586,34.1472]],[[-70.4028,32.2848],[-70.3515,32.0838],[-70.1346,32.1076],[-70.0956,32.283],[-70.2688,32.3812]],[[-69.9867,33.3962],[-70.125,33.4881],[-70.2958,33.4252],[-70.2873,33.2],[-70.2075,33.1582],[-70.0124,33.2368]],[[-71.6364,32.0933],[-71.6913,32.0653],[-71.7459,32.0107],[-71.781,31.9418],[-71.7931,31.8654],[-71.781,31.7891],[-71.7459,31.7202],[-71.7416,31.7158],[-71.4614,31.7552],[-71.3881,31.9121]],[[-69.941,34.8824],[-69.9531,34.9587],[-69.9882,35.0276],[-70.0429,35.0823],[-70.1118,35.1174],[-70.1881,35.1295],[-70.2645,35.1174],[-70.3051,35.0966],[-70.3399,34.7973],[-70.1396,34.7159],[-69.9741,34.7648],[-69.9531,34.806]],[[-71.2894,31.9337],[-71.3881,31.9121],[-71.4614,31.7552],[-71.3542,31.6047],[-71.1871,31.6823],[-71.1972,31.8786]],[[-68.8188,33.359],[-68.8309,33.4354],[-68.866,33.5043],[-68.9207,33.5589],[-68.985,33.5917],[-69.258,33.3542],[-69.2837,33.2779],[-69.1799,33.1788],[-68.848,33.2492],[-68.8309,33.2827]],[[-70.6336,33.8046],[-70.7243,33.8074],[-70.8623,33.6194],[-70.8561,33.6029],[-70.695,33.5128],[-70.5801,33.6989]],[[-70.9848,32.4227],[-71.0995,32.1966],[-71.0017,32.1074],[-70.7937,32.2014],[-70.8757,32.401]],[[-68.4301,32.7504],[-68.4422,32.8268],[-68.4773,32.8957],[-68.5319,32.9503],[-68.6008,32.9854],[-68.6772,32.9975],[-68.7535,32.9854],[-68.7732,32.9754],[-68.799,32.9483],[-68.8477,32.6095],[-68.6085,32.5314],[-68.4744,32.6107],[-68.4422,32.6741]],[[-71.5005,31.1244],[-71.5835,31.1174],[-71.6152,31.0858],[-71.6503,31.0169],[-71.6624,30.9405],[-71.6503,30.8642],[-71.6152,30.7953],[-71.5605,30.7406],[-71.4917,30.7055],[-71.4153,30.6934],[-71.3466,30.7043],[-71.2684,31.0072]],[[-70.9064,33.149],[-70.7853,33.2282],[-70.7914,33.3154],[-70.9573,33.4055],[-71.0954,33.2412]],[[-69.849,34.5895],[-69.8548,34.6262],[-69.8899,34.6951],[-69.9446,34.7497],[-69.9742,34.7648],[-70.1396,34.7159],[-70.2268,34.4991],[-70.1594,34.437],[-69.9136,34.5012]],[[-71.2547,32.1939],[-71.5744,32.2392],[-71.5917,32.2219],[-71.6268,32.153],[-71.6363,32.0933],[-71.3881,31.9121],[-71.2894,31.9337]],[[-71.0041,31.9448],[-70.9378,31.8928],[-70.6882,31.9349],[-70.6589,32.0236],[-70.7083,32.1669],[-70.7937,32.2014],[-71.0017,32.1074]],[[-71.135,32.8937],[-71.2828,32.8393],[-71.3053,32.6407],[-71.2287,32.5247],[-71.0751,32.5278],[-70.9684,32.7113]],[[-69.8007,33.7377],[-69.8574,33.7077],[-69.8733,33.4485],[-69.74,33.402],[-69.5535,33.6007],[-69.5534,33.601]],[[-69.0741,32.2201],[-69.1176,32.2175],[-69.2092,31.9382],[-69.0189,31.8091],[-68.856,31.9504]],[[-70.9684,32.7113],[-71.0751,32.5278],[-70.9848,32.4227],[-70.8757,32.401],[-70.716,32.538],[-70.7162,32.5432],[-70.8497,32.728]],[[-69.8045,32.1206],[-69.992,31.9644],[-69.825,31.7276],[-69.7258,31.745],[-69.6208,31.9532]],[[-71.1972,31.8786],[-71.1871,31.6823],[-71.0433,31.5926],[-70.9318,31.6795],[-70.9378,31.8928],[-71.0041,31.9448]],[[-70.7443,31.0376],[-70.7597,30.662],[-70.6947,30.6289],[-70.6184,30.6168],[-70.542,30.6289],[-70.4905,30.6551],[-70.4652,30.9913],[-70.6833,31.0768]],[[-70.4656,31.3813],[-70.3363,31.2836],[-70.1944,31.3227],[-70.1149,31.4332],[-70.242,31.6142],[-70.4062,31.5608]],[[-69.1176,32.2175],[-69.275,32.3354],[-69.3122,32.3088],[-69.418,31.9705],[-69.3641,31.9257],[-69.2092,31.9382]],[[-70.3051,35.097],[-70.3229,35.1148],[-70.3918,35.1499],[-70.4682,35.162],[-70.5445,35.1499],[-70.6134,35.1148],[-70.6551,35.0731],[-70.5348,34.7804],[-70.3733,34.7765],[-70.3399,34.7973]],[[-69.275,32.3354],[-69.2745,32.3841],[-69.4371,32.5767],[-69.6087,32.5328],[-69.6547,32.3142],[-69.5697,32.2734],[-69.3122,32.3088]],[[-71.4119,33.1715],[-71.4633,33.207],[-71.7893,33.1038],[-71.8005,33.033],[-71.7884,32.9567],[-71.7533,32.8878],[-71.6987,32.8331],[-71.6828,32.825],[-71.4059,32.9164]],[[-70.3409,31.8717],[-70.5609,31.7417],[-70.4062,31.5608],[-70.242,31.6142],[-70.1985,31.7294],[-70.207,31.7888]],[[-70.1834,32.8691],[-70.2446,32.8491],[-70.3739,32.6348],[-70.3725,32.6297],[-70.2592,32.5175],[-70.0096,32.6031]],[[-70.655,35.0728],[-70.6768,35.0762],[-70.7531,35.0641],[-70.7888,35.046],[-70.834,34.7071],[-70.6122,34.6965],[-70.5348,34.7804]],[[-70.8497,32.728],[-70.7552,32.8838],[-70.7661,32.9104],[-70.9147,33.0072],[-71.1108,32.9424],[-71.135,32.8937],[-70.9684,32.7113]],[[-71.9875,34.6305],[-71.6271,34.5798],[-71.5983,34.626],[-71.632,34.7484],[-71.7996,34.8891]],[[-70.3537,33.8784],[-70.5666,33.894],[-70.6336,33.8046],[-70.5801,33.6989],[-70.4148,33.6249],[-70.3179,33.73]],[[-69.4204,31.2961],[-69.4355,31.2937],[-69.497,31.2623],[-69.5725,31.1412],[-69.3722,30.8137],[-69.3645,30.8124],[-69.1296,31.0182],[-69.1817,31.157]],[[-69.74,33.402],[-69.6778,33.2768],[-69.4572,33.3549],[-69.5535,33.6007]],[[-69.5272,33.0665],[-69.69,33.1624],[-69.8519,33.0695],[-69.8769,32.9733],[-69.7706,32.7731],[-69.482,32.8975]],[[-69.019,31.7652],[-69.1463,31.5656],[-69.0027,31.3807],[-68.8127,31.3561],[-68.7333,31.4369],[-68.7192,31.5413]],[[-71.0995,32.1966],[-71.2363,32.2061],[-71.2547,32.1939],[-71.2894,31.9337],[-71.1972,31.8786],[-71.0041,31.9448],[-71.0017,32.1074]],[[-69.6547,32.3142],[-69.7881,32.2504],[-69.8045,32.1206],[-69.6208,31.9532],[-69.4827,31.9863],[-69.5697,32.2734]],[[-70.6122,34.6965],[-70.5417,34.4873],[-70.4184,34.4655],[-70.3928,34.4842],[-70.3733,34.7765],[-70.5348,34.7804]],[[-71.376,35.0262],[-71.4195,35.0483],[-71.4559,35.0541],[-71.632,34.7484],[-71.5983,34.626],[-71.4229,34.6695]],[[-70.3515,32.0838],[-70.3709,32.0522],[-70.3409,31.8717],[-70.207,31.7888],[-70.0077,31.966],[-70.1346,32.1076]],[[-69.5139,33.9848],[-69.7314,33.9318],[-69.8007,33.7377],[-69.5534,33.601],[-69.4968,33.6415]],[[-69.8769,32.9733],[-70.1601,32.9035],[-70.1834,32.8691],[-70.0096,32.6031],[-69.9614,32.5858],[-69.7876,32.695],[-69.7706,32.7731]],[[-70.5609,31.7417],[-70.6058,31.75],[-70.7219,31.627],[-70.7081,31.3883],[-70.6571,31.3432],[-70.4656,31.3813],[-70.4062,31.5608]]],"geoids":["13001","13003","13005","13007","13009","13011","13013","13015","13017","13019","13021","13023","13025","13027","13029","13031","13033","13035","13037","13039","13043","13045","13047","13049","13051","13053","13055","13057","13059","13061","13063","13065","13067","13069","13071","13073","13075","13077","13079","13081","13083","13085","13087","13089","13091","13093","13095","13097","13099","13101","13103","13105","13107","13109","13111","13113","13115","13117","13119","13121","13123","13125","13127","13129","13131","13133","13135","13137","13139","13141","13143","13145","13147","13149","13151","13153","13155","13157","13159","13161","13163","13165","13167","13169","13171","13173","13175","13177","13179","13181","13183","13185","13187","13189","13191","13193","13195","13197","13199","13201","13205","13207","13209","13211","13213","13215","13217","13219","13221","13223","13225","13227","13229","13231","13233","13235","13237","13239","13241","13243","13245","13247","13249","13251","13253","13255","13257","13259","13261","13263","13265","13267","13269","13271","13273","13275","13277","13279","13281","13283","13285","13287","13289","13291","13293","13295","13297","13299","13301","13303","13305","13307","13309","13311","13313","13315","13317","13319","13321"]};
+const CO=DATA.counties, FA=DATA.facilities, M=DATA.meta.model, BASE=DATA.verified_baseline;
+const RAMP=['#FFF3E0','#FDBE73','#F57C00','#D32F2F','#7B1616'];
+const DIV=['#D32F2F','#F0928A','#E8EDF3','#86C295','#2E7D32'];
+const BUCK=[[0,15,'Under 15 min'],[15,30,'15–30 min'],[30,45,'30–45 min'],[45,60,'45–60 min'],[60,1e9,'Over 60 min']];
+const DIVL=[['#D32F2F','Worse by 10+ min'],['#F0928A','Worse 2–10 min'],['#E8EDF3','No change'],
+            ['#86C295','Better 2–10 min'],['#2E7D32','Better by 10+ min']];
+const LVLW={IV:4,III:3,II:2,I:1};
+const closed=new Set(), added=[];
+let selected=null, tab='changed', view='desert', step=0;
+const CRISIS='#DC2626', RESCUE='#16A34A', SAFE='#E2E8F0';
+const HIGH=['III','IV'];
+// nearest Level III/IV facility — the acuity question judges ask
+function nearestHigh(c){let b=null,bm=Infinity,bd=0;
+  for(const f of actF()){ if(!HIGH.includes(f.level)) continue;
+    const m=minutes(c,f); if(m<bm){bm=m;b=f;bd=m*M.avg_mph/60/M.road_factor;} }
+  return b?{f:b,min:bm,mi:bd}:null;}
+const CELLOF={}; CELLS.geoids.forEach((g,i)=>CELLOF[g]=CELLS.cells[i]);
+
+const rad=d=>d*Math.PI/180, fmt=n=>Math.round(n).toLocaleString('en-US');
+function minutes(c,f){const dp=rad(f.lat-c.lat),dl=rad(f.lon-c.lon);
+  const h=Math.sin(dp/2)**2+Math.cos(rad(c.lat))*Math.cos(rad(f.lat))*Math.sin(dl/2)**2;
+  return (2*M.earth_radius_miles*Math.asin(Math.sqrt(h))*M.road_factor/M.avg_mph)*60;}
+const actF=()=>FA.filter(f=>f.status==='active'&&!closed.has(f.id)).concat(added);
+function solve(){const a=actF(),o={};
+  for(const c of CO){let b=null,bm=Infinity;for(const f of a){const m=minutes(c,f);if(m<bm){bm=m;b=f;}}o[c.geoid]={min:bm,fac:b};}
+  return o;}
+const B0=solve();
+const capOf=l=>l.reduce((t,f)=>t+(LVLW[f.level]||1),0);
+function risk(S){let w=0,t=0;for(const c of CO){w+=c.births*Math.max(0,(S[c.geoid].min-30)/30);t+=c.births;}return 100*w/t;}
+function stats(S){let no=0,bn=0,tot=0,w=0;
+  for(const c of CO){const m=S[c.geoid].min;w+=m*c.births;tot+=c.births;if(m>30){no++;bn+=c.births;}}
+  return{no,bn,avg:w/tot,risk:risk(S),cap:capOf(actF())};}
+function band(S){const b=CO.map(c=>({m:S[c.geoid].min,b:c.births})),tot=b.reduce((t,x)=>t+x.b,0),N=400,o=[];
+  for(let i=0;i<N;i++){const k=((1.20+Math.random()*.25)/M.road_factor)*(M.avg_mph/(38+Math.random()*14));
+    let w=0;for(const x of b)w+=x.m*k*x.b;o.push(w/tot);}
+  o.sort((a,b)=>a-b);return{p10:o[40],p90:o[359]};}
+const bIdx=m=>BUCK.findIndex(b=>m>=b[0]&&m<b[1]);
+const dIdx=d=>d>10?0:d>2?1:d>=-2?2:d>=-10?3:4;
+
+function tile(lab,fig,pill,pcls,sub,tcls,anchor){
+  return `<div class="tile ${tcls||''}${anchor?' anchor':''}">
+    <div class="lab">${lab}${anchor?' <span class="crisisbadge">Crisis</span>':''}</div>
+    <div class="fig num">${fig}</div>
+    <div class="foot">${pill?`<span class="pill ${pcls}">${pill}</span>`:''}<span class="sub">${sub}</span></div></div>`;}
+
+function render(){
+  const staged=closed.size||added.length;
+  const S=staged?solve():B0, st=stats(S), b0=stats(B0), cb=band(S);
+  const capB=capOf(FA.filter(f=>f.status==='active')), nB=FA.filter(f=>f.status==='active').length;
+  const rows=CO.map(c=>{const a=B0[c.geoid],b=S[c.geoid];
+    const ha=a.min<=30,hb=b.min<=30;
+    let s='unchanged'; if(ha&&!hb)s='lost'; else if(!ha&&hb)s='gained'; else if(a.fac.id!==b.fac.id)s='shifted';
+    return{c,base:a,scen:b,delta:b.min-a.min,state:s};});
+  const changed=rows.filter(r=>r.state!=='unchanged').sort((x,y)=>y.delta-x.delta);
+  const lost=rows.filter(r=>r.state==='lost'), gained=rows.filter(r=>r.state==='gained');
+  const disp=lost.reduce((t,r)=>t+r.c.births,0), resc=gained.reduce((t,r)=>t+r.c.births,0);
+  const worst=changed.length?Math.max(...changed.map(r=>r.delta)):0;
+  const best=changed.length?Math.min(...changed.map(r=>r.delta)):0;
+
+  const P=(d,unit,inv)=>{const up=d>0.049,dn=d<-0.049;
+    const cls=!up&&!dn?'flat':(inv?(up?'down':'up'):(up?'up':'down'));
+    return staged?[`${up?'▲ +':dn?'▼ ':'● '}${Math.abs(d).toFixed(unit==='min'||unit==='idx'?1:0)}${unit==='min'?' min':unit==='idx'?'':''}`,cls]:['',''];};
+  const [p1,c1]=P(st.no-b0.no,''), [p2,c2]=P(st.bn-b0.bn,''), [p3,c3]=P(st.avg-b0.avg,'min'),
+        [p4,c4]=P(st.risk-b0.risk,'idx'), [p5,c5]=P(st.cap-capB,'',true), [p6,c6]=P(actF().length-nB,'',true);
+  document.getElementById('strip').innerHTML=
+    tile('Counties beyond 30 min',st.no,p1,c1,staged?'of 159':'46.5% of 159 counties','',true)+
+    tile('Births beyond 30 min',fmt(st.bn),p2,c2,staged?'annual exposed':'7.8% of GA births','',true)+
+    tile('Avg drive time',st.avg.toFixed(1)+' min',p3,c3,`90% band ${cb.p10.toFixed(1)}–${cb.p90.toFixed(1)} min`,c3==='up'?'warn':c3==='down'?'pos':'')+
+    tile('Access risk index',st.risk.toFixed(1),p4,c4,'births-weighted excess exposure',c4==='up'?'crit':c4==='down'?'pos':'')+
+    tile('L&amp;D capacity',st.cap,p5,c5,'level-weighted proxy · grade C',c5==='down'?'crit':c5==='up'?'pos':'')+
+    tile('Active facilities',actF().length,p6,c6,staged?'in scenario':'62 in-state + 6 border',c6==='down'?'crit':c6==='up'?'pos':'');
+
+  const names=[...closed].map(id=>FA.find(f=>f.id===id).name);
+  let sev='', txt;
+  if(added.length&&!closed.size){ sev='pos';
+    txt=gained.length?`Opening a Level III maternity center in ${added[0].city} County reduces modeled drive time by up to ${Math.round(-best)} minutes for ${changed.length} ${changed.length===1?'county':'counties'}, bringing ${fmt(resc)} annual births inside the 30-minute access threshold.`
+      :`Opening a Level III maternity center in ${added[0].city} County shortens drive time for ${changed.length} counties, but none cross inside the 30-minute threshold.`;
+  } else if(!staged){ sev='';
+    txt=`No facility changes staged — statewide baseline: <b>74 of 159 counties (46.5%)</b> already lie beyond the 30-minute emergency access threshold, covering <b>13,029 annual births</b>.`;
+  } else { sev=lost.length?'crit':(worst>10?'warn':'');
+    const ev=names.length===1?`Closing the L&amp;D unit at <b>${names[0]}</b>`:`Closing <b>${names.length}</b> L&amp;D units`;
+    txt=changed.length?`${ev} raises modeled drive time by up to <b>${Math.round(worst)} minutes</b> across <b>${changed.length}</b> ${changed.length===1?'county':'counties'}${disp?`, shifting <b>${fmt(disp)} annual births</b> beyond the 30-minute access threshold.`:'.'}`
+      :`${ev} leaves modeled travel time unchanged statewide.`;}
+  document.getElementById('hl').className='headline '+sev;
+  document.getElementById('hlText').innerHTML=txt;
+  document.getElementById('hlMeta').innerHTML=staged
+    ? `<span class="tag">Modeled estimate</span><span class="tag">Confidence ${DATA.meta.confidence_grade}</span><span class="tag">Haversine ×1.30 / 45 mph</span><span class="tag">Not routed drive time</span>`
+    : `<span class="tag">Verified baseline</span><span class="tag">GDPH OASIS 2024</span><span class="tag">March of Dimes 2026</span>`;
+
+  // ledger
+  document.getElementById('legTitle').textContent=
+    view==='delta'?'Change vs baseline':view==='desert'?'Maternity deserts':'Modeled drive time';
+  if(view==='desert'){
+    let nd=0; for(const x of CO) if(S[x.geoid].min>30) nd++;
+    document.getElementById('leg').innerHTML=
+      `<div class="lrow"><span class="dotpill" style="background:${CRISIS}"></span><span class="t">Beyond 30 min &mdash; desert</span><span class="n num">${nd}</span></div>
+       <div class="lrow"><span class="dotpill" style="background:${SAFE};border-color:#CBD5E1"></span><span class="t">Within 30 min</span><span class="n num">${159-nd}</span></div>
+       <div class="lrow"><span class="t muted">${fmt(CO.filter(c=>S[c.geoid].min>30).reduce((t,c)=>t+c.births,0))} births exposed</span></div>`;
+  } else if(view==='delta'){const c=[0,0,0,0,0];for(const r of rows)c[dIdx(r.delta)]++;
+    document.getElementById('leg').innerHTML=DIVL.map((b,i)=>
+      `<div class="lrow"><span class="dotpill" style="background:${b[0]}"></span><span class="t">${b[1]}</span><span class="n num">${c[i]}</span></div>`).join('');
+  } else {const c=[0,0,0,0,0];for(const x of CO)c[bIdx(S[x.geoid].min)]++;
+    document.getElementById('leg').innerHTML=BUCK.map((b,i)=>
+      `<div class="lrow"><span class="dotpill" style="background:${RAMP[i]}"></span><span class="t">${b[2]}</span><span class="n num">${c[i]}</span></div>`).join('');}
+  document.getElementById('legScen').innerHTML=staged
+    ?`<div class="lrow"><span class="t">Lost</span><span class="n num" style="color:#B71C1C">${lost.length}</span></div>
+      <div class="lrow"><span class="t">Gained</span><span class="n num" style="color:#1B5E20">${gained.length}</span></div>
+      <div class="lrow"><span class="t">Displaced</span><span class="n num">${fmt(disp)}</span></div>`
+    :'<div class="lrow"><span class="t muted">Baseline &mdash; no changes staged</span></div>';
+
+  drawMap(S,rows); drawDrawer(changed,rows);
+  if(typeof placePanel==='function') requestAnimationFrame(placePanel);
+  document.getElementById('dmeta').textContent=
+    (staged?`${changed.length} counties changed · `:'Baseline · ')+(selected?selected.name+' County':'click a county on the map');
+  document.getElementById('chips').innerHTML=
+    [...closed].map(id=>{const f=FA.find(x=>x.id===id);
+      return `<span class="chip">${f.name}<button data-un="${id}">&times;</button></span>`;}).join('')+
+    added.map((a,i)=>`<span class="chip add">+ ${a.name}<button data-rm="${i}">&times;</button></span>`).join('');
+  document.querySelectorAll('[data-un]').forEach(b=>b.onclick=e=>{closed.delete(e.target.dataset.un);render();});
+  document.querySelectorAll('[data-rm]').forEach(b=>b.onclick=e=>{added.splice(+e.target.dataset.rm,1);render();});
+}
+
+function drawMap(S,rows){
+  const svg=document.getElementById('map'), kx=CELLS.kx, B=CELLS.bbox;
+  const w=B[2]-B[0], h=B[3]-B[1], pad=w*0.02;
+  // viewBox scales with the container, so the map never clips when the drawer
+  // resizes the stage. y is flipped at emit time (north up).
+  svg.setAttribute('viewBox',`${(B[0]-pad).toFixed(3)} ${(-pad).toFixed(3)} ${(w+2*pad).toFixed(3)} ${(h+2*pad).toFixed(3)}`);
+  svg.setAttribute('preserveAspectRatio','xMidYMid meet');
+  const X=u=>u, Y=v=>B[3]-v;
+  let g='', marks=[];
+  for(const r of rows){
+    const cell=CELLOF[r.c.geoid]; if(!cell) continue;
+    const fill = view==='delta' ? DIV[dIdx(r.delta)]
+               : view==='desert' ? (S[r.c.geoid].min>30 ? CRISIS : SAFE)
+               : RAMP[bIdx(S[r.c.geoid].min)];
+    const d=cell.map((p,i)=>(i?'L':'M')+p[0].toFixed(3)+','+Y(p[1]).toFixed(3)).join('')+'Z';
+    const hi=r.state==='lost'?CRISIS:r.state==='gained'?RESCUE:null;
+    g+=`<path class="cell${selected&&selected.geoid===r.c.geoid?' sel':''}" d="${d}" fill="${fill}"
+        ${hi?`stroke="${hi}" stroke-width="2.6"`:''} vector-effect="non-scaling-stroke" data-g="${r.c.geoid}"/>`;
+    if(hi) marks.push({r,hi});
+  }
+  // Secondary encoding: red/green alone is ΔE 5.0 for deuteranopes, so every
+  // affected county also gets a pulse ring (motion) and a glyph (shape).
+  for(const m of marks){
+    const x=m.r.c.lon*kx, y=Y(m.r.c.lat), lost=m.r.state==='lost';
+    if(lost) g+=`<circle class="pulse" cx="${x.toFixed(3)}" cy="${y.toFixed(3)}" r="0.13" stroke="${CRISIS}" vector-effect="non-scaling-stroke"/>`;
+    g+=`<circle cx="${x.toFixed(3)}" cy="${y.toFixed(3)}" r="0.085" fill="${m.hi}" stroke="#fff" stroke-width="1.6" vector-effect="non-scaling-stroke"/>`;
+    g+=`<text class="cmark" x="${x.toFixed(3)}" y="${(y+0.045).toFixed(3)}" fill="#fff">${lost?'!':'\u2713'}</text>`;
+  }
+  const T=0.055;
+  for(const f of actF()){
+    const x=f.lon*kx, y=Y(f.lat), nw=f.id.startsWith('new_');
+    g+=`<path d="M${x.toFixed(3)},${(y-T*1.25).toFixed(3)}L${(x+T).toFixed(3)},${(y+T*0.8).toFixed(3)}L${(x-T).toFixed(3)},${(y+T*0.8).toFixed(3)}Z"
+        fill="${nw?'#2E7D32':'#0F172A'}" stroke="#fff" stroke-width="1.4" vector-effect="non-scaling-stroke"
+        data-f="${f.id}" style="cursor:pointer"/>`;
+  }
+  for(const f of FA.filter(x=>closed.has(x.id))){
+    const x=f.lon*kx, y=Y(f.lat), c=T*1.3;
+    g+=`<g data-f="${f.id}" style="cursor:pointer">
+      <circle cx="${x.toFixed(3)}" cy="${y.toFixed(3)}" r="${c.toFixed(3)}" fill="#fff" stroke="#D32F2F" stroke-width="2.4" vector-effect="non-scaling-stroke"/>
+      <path d="M${(x-c*0.5).toFixed(3)},${(y-c*0.5).toFixed(3)}L${(x+c*0.5).toFixed(3)},${(y+c*0.5).toFixed(3)}M${(x+c*0.5).toFixed(3)},${(y-c*0.5).toFixed(3)}L${(x-c*0.5).toFixed(3)},${(y+c*0.5).toFixed(3)}"
+        stroke="#D32F2F" stroke-width="2.2" stroke-linecap="round" vector-effect="non-scaling-stroke"/></g>`;
+  }
+  svg.innerHTML=g;
+  const tip=document.getElementById('tip');
+  const move=(e,html)=>{tip.style.opacity=1;tip.innerHTML=html;
+    const r=tip.getBoundingClientRect();
+    tip.style.left=Math.min(e.clientX+15,innerWidth-r.width-12)+'px';
+    tip.style.top=Math.min(e.clientY+15,innerHeight-r.height-12)+'px';};
+  svg.querySelectorAll('.cell').forEach(el=>{
+    const r=rows.find(x=>x.c.geoid===el.dataset.g);
+    el.onmousemove=e=>{
+      const m=r.scen.min, hi=nearestHigh(r.c), tags=[];
+      if(m>30) tags.push('<span class="tg bad">&#9888; Desert (&gt;30 min)</span>');
+      else tags.push('<span class="tg ok">&#10003; Within 30 min</span>');
+      if(r.c.desert) tags.push('<span class="tg warn">MoD desert</span>');
+      if(r.state==='lost') tags.push('<span class="tg bad">Lost coverage</span>');
+      if(r.state==='gained') tags.push('<span class="tg ok">Coverage rescued</span>');
+      if(r.state==='shifted') tags.push('<span class="tg n">Reassigned</span>');
+      move(e,`<span class="h">${r.c.name} County</span>
+        <div class="tags">${tags.join('')}</div>
+        <div class="kv">
+          <span>Nearest</span><span>${r.scen.fac.name} &middot; ${m.toFixed(1)} min</span>
+          <span>Nearest Lvl III+</span><span>${hi?`${hi.f.name} &middot; ${hi.mi.toFixed(0)} mi / ${hi.min.toFixed(0)} min`:'none modeled'}</span>
+          <span>Births affected</span><span>${fmt(r.c.births)} / yr</span>
+          ${r.state!=='unchanged'?`<span>Change</span><span>${r.base.min.toFixed(1)} &rarr; ${m.toFixed(1)} min (${r.delta>0?'+':''}${r.delta.toFixed(1)})</span>`:''}
+        </div>`);};
+    el.onmouseleave=()=>tip.style.opacity=0;
+    el.onclick=()=>{selected=r.c;tab='detail';
+      document.querySelectorAll('.dtab').forEach(x=>x.classList.toggle('on',x.dataset.t==='detail'));
+      render();};});
+  svg.querySelectorAll('[data-f]').forEach(el=>{
+    const f=actF().concat(FA).find(x=>x.id===el.dataset.f); if(!f) return;
+    el.onmousemove=e=>move(e,`<span class="h">${f.name}</span><br><span class="m">${f.city}, ${f.state} · Level ${f.level||'—'}${f.border?' · border anchor':''}</span>
+      <br><span class="m">${closed.has(f.id)?'CLOSED in scenario — click to reopen':'click to close'}</span>`);
+    el.onmouseleave=()=>tip.style.opacity=0;
+    el.onclick=()=>{if(f.id.startsWith('new_'))return;closed.has(f.id)?closed.delete(f.id):closed.add(f.id);
+      step=0;document.querySelectorAll('.step').forEach(x=>x.classList.remove('on'));render();};});
+}
+
+function drawDrawer(changed,rows){
+  const b=document.getElementById('dbody');
+  if(tab==='changed'){
+    // selected county floats to the top so a map click is instantly readable
+    const ord=selected?[...changed].sort((a,b)=>(b.c.geoid===selected.geoid)-(a.c.geoid===selected.geoid)):changed;
+    b.innerHTML=changed.length?`<table><thead><tr><th>County</th><th class="n">Births</th><th class="n">Drive time</th><th class="n">Change</th></tr></thead><tbody>`+
+      ord.map(r=>`<tr data-g="${r.c.geoid}"${selected&&selected.geoid===r.c.geoid?' class="sel"':''}>
+        <td><b>${r.c.name}</b><br><span class="muted" style="font-size:10.5px">&rarr; ${r.scen.fac.name}</span></td>
+        <td class="n">${fmt(r.c.births)}</td>
+        <td class="n">${r.base.min.toFixed(1)} &rarr; ${r.scen.min.toFixed(1)}<br>
+          <span class="status ${r.state}">${r.state==='lost'?'Critical':r.state==='gained'?'Gained':'Absorbed'}</span></td>
+        <td class="n"><span class="${r.delta>0?'over':'under'}">${r.delta>0?'+':''}${r.delta.toFixed(1)} min</span></td></tr>`).join('')+'</tbody></table>'
+      :(()=>{
+        const S2=(closed.size||added.length)?solve():B0;
+        const gaps=CO.map(c=>({c,m:S2[c.geoid].min})).filter(x=>x.m>30)
+                     .sort((a,b)=>b.c.births-a.c.births).slice(0,12);
+        return `<p class="muted" style="margin:2px 0 10px;font-size:11.5px">No scenario staged — showing the largest existing access gaps.</p>
+        <table><thead><tr><th>County</th><th class="n">Births / yr</th><th class="n">Drive</th><th class="n">Over 30</th></tr></thead><tbody>`+
+        gaps.map(g=>`<tr data-g="${g.c.geoid}"${selected&&selected.geoid===g.c.geoid?' class="sel"':''}>
+          <td><b>${g.c.name}</b><br><span class="muted" style="font-size:10.5px">&rarr; ${S2[g.c.geoid].fac.name}</span></td>
+          <td class="n">${fmt(g.c.births)}</td><td class="n">${g.m.toFixed(1)} min</td>
+          <td class="n"><span class="over">+${(g.m-30).toFixed(1)} min</span></td></tr>`).join('')+'</tbody></table>';})();
+    b.querySelectorAll('tr[data-g]').forEach(tr=>{tr.style.cursor='pointer';
+      tr.onclick=()=>{selected=CO.find(c=>c.geoid===tr.dataset.g);render();};});
+  } else if(tab==='absorb'){
+    const agg={}; for(const r of changed){ if(r.scen.fac.id===r.base.fac.id)continue;
+      (agg[r.scen.fac.id]||={f:r.scen.fac,n:0,b:0}); agg[r.scen.fac.id].n++; agg[r.scen.fac.id].b+=r.c.births;}
+    const bb={}; for(const c of CO){const id=B0[c.geoid].fac.id; bb[id]=(bb[id]||0)+c.births;}
+    const L=Object.values(agg).sort((a,b)=>b.b-a.b);
+    b.innerHTML=L.length?`<table><thead><tr><th>Facility</th><th class="n">Absorbed</th><th class="n">Increase</th></tr></thead><tbody>`+
+      L.map(a=>{const base=bb[a.f.id]||0;return `<tr><td><b>${a.f.name}</b><br><span class="muted" style="font-size:10.5px">${a.f.city} · Level ${a.f.level||'—'} · ${a.n} ${a.n===1?'county':'counties'}</span></td>
+        <td class="n"><b>${fmt(a.b)}</b><br><span class="muted" style="font-size:10.5px">of ${fmt(base)}</span></td>
+        <td class="n">${base?`<span class="status ${100*a.b/base>25?'lost':'shifted'}">+${(100*a.b/base).toFixed(0)}%</span>`:'<span class="muted" style="font-size:10.5px">new<br>catchment</span>'}</td></tr>`;}).join('')+'</tbody></table>'
+      :'<p class="muted" style="padding:14px 0">No births reassigned.</p>';
+  } else {
+    if(!selected){b.innerHTML='<p class="muted" style="padding:14px 0">Click any county on the map to inspect it.</p>';return;}
+    const c=selected,r=rows.find(x=>x.c.geoid===c.geoid);
+    const tr=((c.births-c.births2015)/c.births2015*100);
+    b.innerHTML=`<table class="kv"><tbody>
+      <tr><th>County</th><td><b>${c.name}</b> &middot; FIPS ${c.geoid}</td></tr>
+      <tr><th>Nearest facility</th><td>${r.scen.fac.name} — ${r.scen.fac.city}, ${r.scen.fac.state}${r.scen.fac.border?' (border anchor)':''} &middot; Level ${r.scen.fac.level||'—'}</td></tr>
+      <tr><th>Modeled travel time</th><td><b class="num">${r.scen.min.toFixed(1)} min</b> &nbsp;<span class="status ${r.scen.min<=30?'gained':'lost'}">${r.scen.min<=30?'Within 30 min':'Beyond 30 min'}</span>
+        ${r.state!=='unchanged'?` &nbsp;<span class="muted">baseline ${r.base.min.toFixed(1)} min (${r.delta>0?'+':''}${r.delta.toFixed(1)})</span>`:''}</td></tr>
+      <tr><th>Annual births (2024)</th><td class="num">${fmt(c.births)} &nbsp;<span class="muted">2015: ${fmt(c.births2015)} · ${tr>0?'+':''}${tr.toFixed(1)}% over the decade</span></td></tr>
+      <tr><th>March of Dimes tier</th><td>${c.tier}${c.desert?' &middot; <b>maternity care desert</b>':''}</td></tr></tbody></table>
+      <div class="evid"><b>Clinical context.</b><br>${DATA.meta.clinical_evidence.map(e=>`&bull; ${e.band} — ${e.finding}`).join('<br>')}
+      <br><span class="muted">${DATA.meta.threshold_note}</span></div>`;
+  }
+}
+
+// ── assistant ──
+const plog=document.getElementById('plog');
+const say=(t,who,src)=>{const d=document.createElement('div');d.className='msg '+who;
+  d.innerHTML=t+(src?`<span class="src">${src}</span>`:'');plog.appendChild(d);plog.scrollTop=plog.scrollHeight;};
+const SRC='Modeled estimate · Confidence B · Haversine ×1.30 / 45 mph · not routed drive time';
+function answer(q){const t=q.toLowerCase(),S=(closed.size||added.length)?solve():B0;
+  if(/\b(should i|my pregnancy|am i|safest for me|my baby|i'm pregnant|im pregnant|which hospital should)\b/.test(t))
+    return["I can't advise on individual medical care or recommend a facility for a specific person. MaternalGrid models geographic access for planning, not clinical decisions. Please consult a healthcare provider — in an emergency, call 911. I'm glad to explain regional access patterns instead.",''];
+  if(/desert/.test(t))return[`A <b>maternity care desert</b> is a county with no hospital or birth centre offering obstetric care and no obstetric provider. Georgia has <b>${BASE.mod_deserts} of 159</b> (${BASE.pct_mod_desert}%). They hold just <b>${BASE.desert_births_share_pct}%</b> of the state's births — a small share of births across a large share of its land.`,'March of Dimes 2026 · GDPH OASIS 2024'];
+  if(/30 min|thirty|threshold/.test(t))return[`30 minutes is a <b>conservative operational planning threshold, not a published clinical cut-point</b>.<br>${DATA.meta.clinical_evidence.map(e=>`&bull; ${e.band}: ${e.finding}`).join('<br>')}<br>It sits below the first measured risk tier.`,'Peer-reviewed literature'];
+  if(/biggest gap|where should|most under|worst|priority/.test(t)){
+    const g=CO.map(c=>({c,m:S[c.geoid].min})).filter(x=>x.m>30).sort((a,b)=>b.c.births-a.c.births).slice(0,5);
+    return[`Ranked by annual births beyond 30 minutes:<br>${g.map((x,i)=>`${i+1}. <b>${x.c.name}</b> — ${fmt(x.c.births)} births, ${x.m.toFixed(1)} min`).join('<br>')}<br><i>Candidates for analysis, not a funding recommendation.</i>`,SRC];}
+  if(/source|data come|where.*data|cite|current/.test(t))
+    return[`Births: <b>${DATA.meta.sources.births}</b><br>Access tiers: <b>${DATA.meta.sources.tiers}</b><br>Facilities: <b>${DATA.meta.sources.facilities}</b><br>All public, aggregate, county-level. No patient records, no PHI.`,'Open data — citable'];
+  if(/how.*calculat|travel time|method|model|accurate|confiden/.test(t))
+    return[`Haversine distance from the county population centre to each facility × road factor <b>1.30</b> ÷ <b>45 mph</b>; nearest active facility wins. <b>Not</b> routed drive time — no traffic, weather or time of day. A 90% band is published on the statewide average.`,SRC];
+  const hit=CO.find(c=>t.includes(c.name.toLowerCase()));
+  if(hit){const m=S[hit.geoid],b=B0[hit.geoid],d=m.min-b.min;
+    return[`<b>${hit.name} County</b> — nearest delivering facility is <b>${m.fac.name}</b> at <b>${m.min.toFixed(1)} min</b> (${m.min<=30?'within':'beyond'} the threshold).<br>${fmt(hit.births)} annual births · MoD tier: ${hit.tier}.`+
+      (Math.abs(d)>.05?`<br>Under the staged scenario: ${d>0?'+':''}${d.toFixed(1)} min vs baseline.`:''),SRC];}
+  return["I don't have grounded information on that. I can cover maternity care deserts, the 30-minute threshold, methodology, data sources, the largest access gaps, or any Georgia county by name.",''];}
+const ask=q=>{say(q,'me');const[a,s]=answer(q);setTimeout(()=>say(a,'bot',s),170);};
+const panel=document.getElementById('panel'), fab=document.getElementById('fab');
+// Keep the assistant clear of the inspection drawer: anchor it above whatever
+// height the drawer currently occupies, and cap it so it never runs off-screen.
+function placePanel(){
+  const bottom=94;
+  panel.style.bottom=bottom+'px';
+  panel.style.maxHeight=Math.max(220, Math.round(innerHeight-bottom-24))+'px';
+}
+addEventListener('resize',placePanel);
+fab.onclick=()=>{placePanel();const on=panel.classList.toggle('on');panel.classList.remove('min');
+  fab.setAttribute('aria-expanded',on);
+  const bd=fab.querySelector('.badge'); if(bd)bd.remove();
+  if(on&&!plog.children.length)say("I help interpret MaternalGrid access simulations for planning. My figures are AI-assisted estimates from open Georgia health data, not clinical guidance. For personal medical questions please talk to a healthcare provider — in an emergency, call 911.",'bot');
+  if(on)document.getElementById('pIn').focus();};
+document.getElementById('pMin').onclick=e=>{e.stopPropagation();panel.classList.toggle('min');};
+document.getElementById('pClose').onclick=e=>{e.stopPropagation();panel.classList.remove('on');
+  fab.setAttribute('aria-expanded','false');fab.focus();};
+addEventListener('keydown',e=>{if(e.key==='Escape'&&panel.classList.contains('on')){panel.classList.remove('on');fab.focus();}});
+document.getElementById('fabHide').onclick=e=>{e.stopPropagation();
+  panel.classList.remove('on'); fab.setAttribute('aria-expanded','false');
+  document.getElementById('fabWrap').classList.add('hid');
+  document.getElementById('fabShow').classList.add('on');};
+document.getElementById('fabShow').onclick=()=>{
+  document.getElementById('fabWrap').classList.remove('hid');
+  document.getElementById('fabShow').classList.remove('on');
+  fab.focus();};
+document.querySelectorAll('.pquick button').forEach(b=>b.onclick=()=>ask(b.dataset.q));
+document.getElementById('pIn').addEventListener('keydown',e=>{
+  if(e.key==='Enter'&&e.target.value.trim()){ask(e.target.value.trim());e.target.value='';}});
+
+// ── executive tour ──
+// Each step stages a scenario, sets the map mode that tells its story, and
+// eases the viewBox toward the counties the step is about.
+let flyRAF=null;
+function flyTo(geoids,pad){
+  const svg=document.getElementById('map'), B=CELLS.bbox;
+  const full=[B[0]-(B[2]-B[0])*0.02, -(B[2]-B[0])*0.02, (B[2]-B[0])*1.04, (B[3]-B[1])*1.04];
+  let target=full;
+  if(geoids&&geoids.length){
+    let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9;
+    for(const g of geoids){const cell=CELLOF[g]; if(!cell)continue;
+      for(const p of cell){x0=Math.min(x0,p[0]);x1=Math.max(x1,p[0]);y0=Math.min(y0,B[3]-p[1]);y1=Math.max(y1,B[3]-p[1]);}}
+    if(x1>x0){
+      const m=(pad||0.9);
+      const cx=(x0+x1)/2, cy=(y0+y1)/2;
+      let w=Math.max((x1-x0)*(1+m),(B[2]-B[0])*0.62), h=Math.max((y1-y0)*(1+m),(B[3]-B[1])*0.62);
+      const ar=full[2]/full[3];
+      if(w/h<ar) w=h*ar; else h=w/ar;
+      target=[cx-w/2, cy-h/2, w, h];
+    }
+  }
+  const cur=(svg.getAttribute('viewBox')||full.join(' ')).split(/\s+/).map(Number);
+  const t0=performance.now(), DUR=760;
+  if(flyRAF) cancelAnimationFrame(flyRAF);
+  const ease=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
+  (function tick(now){
+    const k=Math.min(1,(now-t0)/DUR), e=ease(k);
+    svg.setAttribute('viewBox',cur.map((v,i)=>(v+(target[i]-v)*e).toFixed(3)).join(' '));
+    if(k<1) flyRAF=requestAnimationFrame(tick);
+  })(t0);
+}
+const TOURNOTE={
+  0:'Start here — each step stages the scenario and flies the map to the affected region.',
+  1:'74 of 159 counties already sit beyond the 30-minute emergency threshold — 13,029 births a year.',
+  2:'One rural closure pushes Hart County over the line and reassigns its births across a state border.',
+  3:'A single Level III center in Effingham pulls 870 births back inside the threshold.'};
+function goStep(n){
+  step=n; closed.clear(); added.length=0; selected=null;
+  if(n===1){ view='desert'; tab='changed'; }
+  if(n===2){ closed.add('ga_sacred_heart_medical_center_lavonia'); view='desert'; tab='changed'; }
+  if(n===3){ addFac('13103'); view='delta'; tab='changed'; }
+  document.querySelectorAll('.dtab').forEach(x=>x.classList.toggle('on',x.dataset.t===tab));
+  document.querySelectorAll('.step').forEach(b=>b.classList.toggle('on',+b.dataset.step===n));
+  document.getElementById('tourNote').textContent=TOURNOTE[n]||TOURNOTE[0];
+  syncMode(); render();
+  requestAnimationFrame(()=>{
+    if(n===2) flyTo(['13147','13119','13105'],1.6);
+    else if(n===3) flyTo(['13103'],2.2);
+    else flyTo(null);
+  });
+}
+document.querySelectorAll('.step').forEach(b=>b.onclick=()=>goStep(+b.dataset.step));
+document.getElementById('customBtn').onclick=e=>{
+  const on=document.getElementById('custom').classList.toggle('on');
+  e.target.classList.toggle('on',on);
+  e.target.innerHTML='Custom simulation '+(on?'&#9652;':'&#9662;');};
+document.getElementById('resetBtn').onclick=()=>goStep(1);
+
+// ── wiring ──
+document.getElementById('faclist').innerHTML=FA.filter(f=>f.status==='active').map(f=>`<option value="${f.name}">`).join('');
+document.getElementById('addSel').innerHTML='<option value="">Open a Level III facility in…</option>'+
+  CO.slice().sort((a,b)=>a.name.localeCompare(b.name)).map(c=>`<option value="${c.geoid}">${c.name} County</option>`).join('');
+function addFac(g){const c=CO.find(x=>x.geoid===g); if(!c||added.some(a=>a.geoid===g))return;
+  added.push({id:'new_'+g,name:`Proposed Level III — ${c.name}`,city:c.name,state:'GA',border:false,
+              level:'III',status:'active',lat:c.lat,lon:c.lon,geoid:g});}
+document.getElementById('closeIn').addEventListener('change',e=>{
+  const f=FA.find(x=>x.name===e.target.value&&x.status==='active');
+  if(f){closed.add(f.id);e.target.value='';step=0;
+    document.querySelectorAll('.step').forEach(x=>x.classList.remove('on'));render();}});
+document.getElementById('addSel').onchange=e=>{if(e.target.value){addFac(e.target.value);e.target.value='';step=0;
+  document.querySelectorAll('.step').forEach(x=>x.classList.remove('on'));render();}};
+function syncSeg(){}
+function syncDrawer(){}
+function syncMode(){document.querySelectorAll('#modeSeg button').forEach(b=>b.classList.toggle('on',b.dataset.m===(view==='scenario'?'bands':view)));}
+document.querySelectorAll('#modeSeg button').forEach(b=>b.onclick=()=>{
+  view=b.dataset.m==='bands'?'scenario':b.dataset.m; syncMode(); render();});
+document.querySelectorAll('.dtab').forEach(t=>t.onclick=()=>{tab=t.dataset.t;
+  document.querySelectorAll('.dtab').forEach(x=>x.classList.toggle('on',x===t));render();});
+addEventListener('resize',()=>render());
+goStep(1);
+const v=stats(B0);
+console.log('[self-check]',v.no,'/',BASE.counties_beyond_30min,'·',v.bn,'/',BASE.births_beyond_30min,
+  '·',v.avg.toFixed(1),'/',BASE.avg_minutes_birth_weighted,
+  '·',(v.no===BASE.counties_beyond_30min&&v.bn===BASE.births_beyond_30min)?'PASS':'FAIL');
+</script></body></html>

@@ -6,6 +6,22 @@ simulate closing or opening a delivering hospital to see how access changes.
 
 The user is a planner, not a patient. MaternalGrid gives no clinical advice.
 
+
+**Live dashboard:** LIVE_URL
+
+## What is in this repository
+
+MaternalGrid was built across three places during and after HackHers 2026. They now live here together.
+
+| Folder | What it is |
+|---|---|
+| `app.py`, `src/`, `tests/` | The Streamlit scenario app (run instructions below) |
+| `dashboard/` | The single file, offline executive dashboard (112 KB, no server). `index.html` is what the live link serves |
+| `migration/` | Moving the data into Postgres with PostGIS and TimescaleDB: schema, ETL, an 11 check verification gate, the travel matrix, and a TypeScript API layer in `migration/server/` |
+| `docs/` | Product specification, timed presenter script, and the grounding corpus for a Copilot Studio agent |
+
+The dashboard reproduces the verified baseline from GDPH OASIS 2024 and March of Dimes 2026: 74 of 159 counties and 13,029 annual births beyond 30 modeled minutes, and 70 maternity care deserts. Travel times are modeled, not routed drive times.
+
 ## Run it
 
 ```bash
